@@ -1,0 +1,23 @@
+from pydantic import BaseModel
+
+
+class ProductCreate(BaseModel):
+    name: str
+    description: str | None = None
+    price: float
+    stock_quantity: int
+    image_url: str | None = None
+    category_id: int
+
+
+class ProductResponse(BaseModel):
+    id: int
+    name: str
+    description: str | None = None
+    price: float
+    stock_quantity: int
+    image_url: str | None = None
+    category_id: int
+
+    class Config:
+        from_attributes = True
