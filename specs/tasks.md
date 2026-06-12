@@ -2,17 +2,17 @@
 
 ## Phase 1 - Project Setup
 
-* Create repository
-* Setup frontend
-* Setup backend
-* Setup database
+* [x] Create repository
+* [ ] Setup frontend
+* [x] Setup backend
+* [x] Setup database
 
 ## Phase 2 - Authentication
 
-* User registration
-* Login
-* JWT authentication
-* Protected routes
+* [x] User registration
+* [x] Login
+* [ ] JWT authentication
+* [ ] Protected routes
 
 ## Phase 3 - Product System
 
