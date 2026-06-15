@@ -11,8 +11,11 @@ from app.schemas.product import (
 
 from app.services.product_service import (
     create_product,
+    get_all_products,
     get_product_by_id,
-    search_products
+    search_products,
+    update_product,
+    delete_product
 )
 
 router = APIRouter(
@@ -68,6 +71,32 @@ def read_product(
     db: Session = Depends(get_db)
 ):
     return get_product_by_id(
+        db,
+        product_id
+    )
+
+@router.put(
+    "/{product_id}",
+    response_model=ProductResponse
+)
+def update_existing_product(
+    product_id: int,
+    product: ProductCreate,
+    db: Session = Depends(get_db)
+):
+    return update_product(
+        db,
+        product_id,
+        product
+    )
+@router.delete(
+    "/{product_id}"
+)
+def delete_existing_product(
+    product_id: int,
+    db: Session = Depends(get_db)
+):
+    return delete_product(
         db,
         product_id
     )

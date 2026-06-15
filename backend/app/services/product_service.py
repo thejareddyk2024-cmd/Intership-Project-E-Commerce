@@ -72,3 +72,51 @@ def search_products(
         .limit(limit)
         .all()
     )
+def update_product(
+    db,
+    product_id: int,
+    product_data
+):
+    product = (
+        db.query(Product)
+        .filter(
+            Product.id == product_id
+        )
+        .first()
+    )
+
+    if not product:
+        return None
+
+    product.name = product_data.name
+    product.description = product_data.description
+    product.price = product_data.price
+    product.stock_quantity = product_data.stock_quantity
+    product.image_url = product_data.image_url
+    product.category_id = product_data.category_id
+
+    db.commit()
+    db.refresh(product)
+
+    return product
+def delete_product(
+    db,
+    product_id: int
+):
+    product = (
+        db.query(Product)
+        .filter(
+            Product.id == product_id
+        )
+        .first()
+    )
+
+    if not product:
+        return None
+
+    db.delete(product)
+    db.commit()
+
+    return {
+        "message": "Product deleted successfully"
+    }
