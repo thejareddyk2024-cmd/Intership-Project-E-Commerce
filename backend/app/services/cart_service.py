@@ -1,3 +1,5 @@
+from fastapi import HTTPException
+
 from app.models.cart import Cart
 from app.models.product import Product
 
@@ -7,6 +9,63 @@ def add_to_cart(
     product_id: int,
     quantity: int
 ):
+    product = (
+        db.query(Product)
+        .filter(
+            Product.id == product_id
+        )
+        .first()
+    )
+
+    if not product:
+        raise HTTPException(
+            status_code=404,
+            detail="Product not found"
+        )
+
+    existing_item = (
+        db.query(Cart)
+        .filter(
+            Cart.user_id == user_id,
+            Cart.product_id == product_id
+        )
+        .first()
+    )
+
+    if existing_item:
+
+        new_quantity = (
+            existing_item.quantity +
+            quantity
+        )
+
+        if new_quantity > product.stock_quantity:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Only "
+                    f"{product.stock_quantity} "
+                    f"items available"
+                )
+            )
+
+        existing_item.quantity = new_quantity
+
+        db.commit()
+        db.refresh(existing_item)
+
+        return existing_item
+
+    if quantity > product.stock_quantity:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"Only "
+                f"{product.stock_quantity} "
+                f"items available"
+            )
+        )
+
     cart_item = Cart(
         user_id=user_id,
         product_id=product_id,
