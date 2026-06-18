@@ -8,7 +8,9 @@ import Cart from "./pages/Cart";
 import Orders from "./pages/Orders";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import AdminProducts from "./pages/AdminProducts";
+import AdminUsers from "./pages/AdminUsers";
 
 function App() {
     return (
@@ -25,9 +27,17 @@ function App() {
                 <Route
                     path="/admin/products"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedAdminRoute>
                             <AdminProducts />
-                        </ProtectedRoute>
+                        </ProtectedAdminRoute>
+                    }
+                />
+                <Route
+                    path="/admin/users"
+                    element={
+                        <ProtectedAdminRoute>
+                            <AdminUsers />
+                        </ProtectedAdminRoute>
                     }
                 />
             </Routes>

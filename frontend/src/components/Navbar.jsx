@@ -3,8 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 function Navbar() {
     const navigate = useNavigate();
 
+    const role = localStorage.getItem("role");
+
     const logout = () => {
         localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        localStorage.removeItem("full_name");
         navigate("/");
     };
 
@@ -31,14 +35,16 @@ function Navbar() {
                         <li className="nav-item">
                             <Link className="nav-link px-4 text-white-50 hover-white" to="/orders">Orders</Link>
                         </li>
-                        <li className="nav-item">
-                            <Link
-                                className="nav-link px-4 text-white-50 hover-white"
-                                to="/admin/products"
-                            >
-                                Admin
-                            </Link>
-                        </li>
+                        {role === "admin" && (
+                            <li className="nav-item">
+                                <Link
+                                    className="nav-link px-4 text-white-50 hover-white"
+                                    to="/admin/products"
+                                >
+                                    Admin
+                                </Link>
+                            </li>
+                        )}
                         <li className="nav-item ms-lg-3">
                             <button className="btn btn-outline-primary btn-sm rounded-pill px-4" onClick={logout}>
                                 Logout

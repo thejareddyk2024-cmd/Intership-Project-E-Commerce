@@ -24,6 +24,14 @@ function Login() {
                 "token",
                 response.data.access_token
             );
+            localStorage.setItem(
+                "role",
+                response.data.role
+            );
+            localStorage.setItem(
+                "full_name",
+                response.data.full_name
+            );
 
             alert("Login Successful!");
             navigate("/products");

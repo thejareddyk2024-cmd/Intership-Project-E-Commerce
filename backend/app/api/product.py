@@ -18,6 +18,9 @@ from app.services.product_service import (
     delete_product
 )
 
+from app.core.auth import require_admin
+from app.models.user import User
+
 router = APIRouter(
     prefix="/api/v1/products",
     tags=["Products"]
@@ -30,7 +33,8 @@ router = APIRouter(
 )
 def create_new_product(
     product: ProductCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    admin: User = Depends(require_admin)
 ):
     return create_product(
         db,
@@ -82,7 +86,8 @@ def read_product(
 def update_existing_product(
     product_id: int,
     product: ProductCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    admin: User = Depends(require_admin)
 ):
     return update_product(
         db,
@@ -94,7 +99,8 @@ def update_existing_product(
 )
 def delete_existing_product(
     product_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    admin: User = Depends(require_admin)
 ):
     return delete_product(
         db,

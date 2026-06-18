@@ -22,6 +22,28 @@ def create_user(
     db.refresh(user)
 
     return user
+
+
+def get_all_users(db: Session):
+    return db.query(User).all()
+
+
+def promote_user(db: Session, user_id: int):
+    user = db.query(User).filter(User.id == user_id).first()
+    if user:
+        user.role = "admin"
+        db.commit()
+        db.refresh(user)
+    return user
+
+
+def demote_user(db: Session, user_id: int):
+    user = db.query(User).filter(User.id == user_id).first()
+    if user:
+        user.role = "customer"
+        db.commit()
+        db.refresh(user)
+    return user
 from app.core.security import verify_password
 from app.models.user import User
 

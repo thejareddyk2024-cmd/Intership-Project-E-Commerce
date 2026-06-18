@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import { Link } from "react-router-dom";
 
 function AdminProducts() {
     const [products, setProducts] = useState([]);
@@ -149,17 +150,22 @@ function AdminProducts() {
     };
 
     return (
-        <div className="container mt-4">
-            <h1>Admin Product Management</h1>
+        <div className="container mt-4 page-wrapper">
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h1 className="gradient-text fw-bold">Product Management</h1>
+                <Link to="/admin/users" className="btn btn-outline-primary rounded-pill">
+                    Manage Users
+                </Link>
+            </div>
             <form
                 onSubmit={
                     editingId
                         ? updateProduct
                         : createProduct
                 }
-                className="card p-4 mt-4 mb-4"
+                className="glass-card p-4 mt-4 mb-4"
             >
-                <h3>
+                <h3 className="text-white mb-4">
                     {editingId
                         ? "Edit Product"
                         : "Create Product"}
@@ -237,48 +243,50 @@ function AdminProducts() {
                     }
                 </button>
             </form>
-                        <table className="table table-striped mt-4">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Stock</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {products.map((product) => (
-                        <tr key={product.id}>
-                            <td>{product.id}</td>
-                            <td>{product.name}</td>
-                            <td>${product.price}</td>
-                            <td>{product.stock_quantity}</td>
-
-                            <td>
-                                <button
-                                    className="btn btn-warning btn-sm me-2"
-                                    onClick={() =>
-                                        startEdit(product)
-                                    }
-                                >
-                                    Edit
-                                </button>
-
-                                <button
-                                    className="btn btn-danger btn-sm"
-                                    onClick={() =>
-                                        deleteProduct(product.id)
-                                    }
-                                >
-                                    Delete
-                                </button>
-                            </td>
+            <div className="glass-card p-4 mt-4">
+                <table className="table table-hover text-white">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Actions</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+
+                    <tbody>
+                        {products.map((product) => (
+                            <tr key={product.id} className="align-middle">
+                                <td>{product.id}</td>
+                                <td>{product.name}</td>
+                                <td>${product.price}</td>
+                                <td>{product.stock_quantity}</td>
+
+                                <td>
+                                    <button
+                                        className="btn btn-warning btn-sm rounded-pill px-3 me-2"
+                                        onClick={() =>
+                                            startEdit(product)
+                                        }
+                                    >
+                                        Edit
+                                    </button>
+
+                                    <button
+                                        className="btn btn-danger btn-sm rounded-pill px-3"
+                                        onClick={() =>
+                                            deleteProduct(product.id)
+                                        }
+                                    >
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }

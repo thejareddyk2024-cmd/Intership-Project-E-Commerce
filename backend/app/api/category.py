@@ -14,6 +14,9 @@ from app.services.category_service import (
     get_all_categories
 )
 
+from app.core.auth import require_admin
+from app.models.user import User
+
 router = APIRouter(
     prefix="/api/v1/categories",
     tags=["Categories"]
@@ -26,7 +29,8 @@ router = APIRouter(
 )
 def create_new_category(
     category: CategoryCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    admin: User = Depends(require_admin)
 ):
     return create_category(
         db,

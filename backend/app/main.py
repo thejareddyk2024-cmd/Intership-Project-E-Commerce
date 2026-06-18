@@ -5,6 +5,7 @@ from app.api.product import router as product_router
 from app.api.wishlist import router as wishlist_router
 from app.api.cart import router as cart_router
 from app.api.order import router as order_router
+from app.api.admin import router as admin_router
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
@@ -34,3 +35,4 @@ app.include_router(product_router)
 app.include_router(wishlist_router)
 app.include_router(cart_router)
 app.include_router(order_router)
+app.include_router(admin_router)
