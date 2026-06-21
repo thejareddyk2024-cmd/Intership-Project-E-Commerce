@@ -9,5 +9,6 @@ psycopg2-binary
 gunicorn
 email-validator
 google-generativeai
-passlib[bcrypt]
+passlib
+bcrypt==4.0.1
 python-jose[cryptography]
