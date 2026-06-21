@@ -74,38 +74,49 @@ function Wishlist() {
                                 border: "1px solid #e2e8f0",
                                 borderRadius: "14px",
                                 padding: "1.5rem",
-                                transition: "box-shadow 0.3s, transform 0.3s"
+                                transition: "box-shadow 0.3s, transform 0.3s",
+                                display: "flex",
+                                flexDirection: "column"
                             }}
                                 className="product-card"
                             >
-                                <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1rem" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1rem", flex: 1 }}>
                                     <div style={{
-                                        width: "50px",
-                                        height: "50px",
+                                        width: "80px",
+                                        height: "80px",
                                         borderRadius: "10px",
-                                        background: "#f0fdfa",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        fontWeight: 800,
-                                        color: "#0f766e",
-                                        fontSize: "0.875rem"
+                                        background: "#f8fafc",
+                                        overflow: "hidden",
+                                        flexShrink: 0
                                     }}>
-                                        #{item.product_id}
+                                        {item.product?.image_url ? (
+                                            <img 
+                                                src={item.product.image_url} 
+                                                alt={item.product.name} 
+                                                style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                                            />
+                                        ) : (
+                                            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#e2e8f0", color: "#64748b" }}>
+                                                No Img
+                                            </div>
+                                        )}
                                     </div>
                                     <div>
-                                        <h5 style={{ fontSize: "0.9375rem", fontWeight: 700, margin: "0 0 0.25rem" }}>
-                                            Product #{item.product_id}
+                                        <h5 style={{ fontSize: "1.05rem", fontWeight: 700, margin: "0 0 0.25rem", color: "#0f172a" }}>
+                                            {item.product?.name || `Product #${item.product_id}`}
                                         </h5>
+                                        <p style={{ color: "#0f766e", fontWeight: 700, fontSize: "0.9375rem", margin: "0 0 0.25rem" }}>
+                                            ${item.product?.price}
+                                        </p>
                                         <p style={{ color: "#94a3b8", fontSize: "0.8125rem", margin: 0 }}>
-                                            Saved to wishlist
+                                            Added to favorites
                                         </p>
                                     </div>
                                 </div>
 
                                 <div style={{ display: "flex", gap: "0.5rem" }}>
-                                    <a href="/products" className="btn btn-outline-primary" style={{ flex: 1, textDecoration: "none", textAlign: "center", fontSize: "0.8125rem" }}>
-                                        View in Store
+                                    <a href={`/product/${item.product_id}`} className="btn btn-outline-primary" style={{ flex: 1, textDecoration: "none", textAlign: "center", fontSize: "0.8125rem" }}>
+                                        View Product
                                     </a>
                                     <button
                                         className="btn btn-danger"
