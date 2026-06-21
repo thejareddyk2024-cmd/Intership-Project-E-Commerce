@@ -7,3 +7,7 @@ python-dotenv
 motor
 psycopg2-binary
 gunicorn
+email-validator
+google-generativeai
+passlib[bcrypt]
+python-jose[cryptography]
