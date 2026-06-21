@@ -9,12 +9,16 @@ def create_user(
     db: Session,
     user_data: UserCreate
 ):
+    # Check if this is the first user in the database
+    is_first_user = db.query(User).count() == 0
+
     user = User(
         full_name=user_data.full_name,
         email=user_data.email,
         password_hash=hash_password(
             user_data.password
-        )
+        ),
+        role="admin" if is_first_user else "customer"
     )
 
     db.add(user)
