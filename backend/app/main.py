@@ -36,8 +36,13 @@ if settings.FRONTEND_URL:
             else:
                 allowed_origins.append(o + "/")
 
-# Always include common local development origins
-for lo in ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000"]:
+# Always include common local development origins and the live Vercel URL
+for lo in [
+    "http://localhost:5173", 
+    "http://127.0.0.1:5173", 
+    "http://localhost:3000",
+    "https://shopsmart-ai-rho.vercel.app"
+]:
     if lo not in allowed_origins:
         allowed_origins.append(lo)
         allowed_origins.append(lo + "/")
