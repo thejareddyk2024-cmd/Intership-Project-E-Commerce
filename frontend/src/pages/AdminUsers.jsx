@@ -11,7 +11,15 @@ function AdminUsers() {
 
     const fetchUsers = async () => {
         try {
-            const response = await api.get("/api/v1/admin/users");
+            const token = localStorage.getItem("token");
+            const response = await api.get(
+                "/api/v1/admin/users",
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
             setUsers(response.data);
         } catch (error) {
             console.log(error);
@@ -20,21 +28,65 @@ function AdminUsers() {
 
     const promote = async (userId) => {
         try {
-            await api.put(`/api/v1/admin/promote/${userId}`);
+
+            const token =
+                localStorage.getItem("token");
+
+            await api.put(
+                `/api/v1/admin/promote/${userId}`,
+                {},
+                {
+                    headers: {
+                        Authorization:
+                            `Bearer ${token}`
+                    }
+                }
+            );
+
             alert("User promoted to Admin");
+
             fetchUsers();
+
         } catch (error) {
-            alert(error.response?.data?.detail || "Failed to promote user");
+
+            alert(
+                error.response?.data?.detail ||
+                "Failed to promote user"
+            );
+
         }
     };
 
     const demote = async (userId) => {
         try {
-            await api.put(`/api/v1/admin/demote/${userId}`);
-            alert("User demoted to Customer");
+
+            const token =
+                localStorage.getItem("token");
+
+            await api.put(
+                `/api/v1/admin/demote/${userId}`,
+                {},
+                {
+                    headers: {
+                        Authorization:
+                            `Bearer ${token}`
+                    }
+                }
+            );
+
+            alert(
+                "User demoted to Customer"
+            );
+
             fetchUsers();
+
         } catch (error) {
-            alert(error.response?.data?.detail || "Failed to demote user");
+
+            alert(
+                error.response?.data?.detail ||
+                "Failed to demote user"
+            );
+
         }
     };
 

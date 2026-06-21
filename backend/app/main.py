@@ -8,16 +8,27 @@ from app.api.order import router as order_router
 from app.api.admin import router as admin_router
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.ai import router as ai_router
+from app.api.review import (router as review_router)
+from app.database.database import engine
+from app.database.base import Base
+from app.api.analytics import (
+    router as analytics_router
+)
+
+Base.metadata.create_all(bind=engine)
+from app.core.config import settings
 
 app = FastAPI(
     title="ShopSmart AI",
     version="1.0.0"
 )
+
+# Parse FRONTEND_URL to support multiple domains if needed (e.g., comma-separated in env)
+allowed_origins = [origin.strip() for origin in settings.FRONTEND_URL.split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173"
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -38,3 +49,9 @@ app.include_router(cart_router)
 app.include_router(order_router)
 app.include_router(admin_router)
 app.include_router(ai_router)
+app.include_router(
+    review_router
+)
+app.include_router(
+    analytics_router
+)

@@ -11,8 +11,7 @@ from app.schemas.order import (
 from app.services.order_service import (
     create_order,
     get_user_orders,
-    get_order_by_id,
-    update_order_status
+    get_order_by_id
 )
 
 router = APIRouter(
@@ -59,18 +58,4 @@ def read_order(
     return get_order_by_id(
         db,
         order_id
-    )
-@router.put(
-    "/{order_id}/status",
-    response_model=OrderResponse
-)
-def update_status(
-    order_id: int,
-    status: str,
-    db: Session = Depends(get_db)
-):
-    return update_order_status(
-        db,
-        order_id,
-        status
     )

@@ -5,3 +5,5 @@ pydantic
 pydantic-settings
 python-dotenv
 motor
+psycopg2-binary
+gunicorn

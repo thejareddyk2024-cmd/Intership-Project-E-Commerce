@@ -40,7 +40,7 @@ def search_products(
     min_price: float | None = None,
     max_price: float | None = None,
     skip: int = 0,
-    limit: int = 10
+    limit: int = 200
 ):
     query = db.query(Product)
 
@@ -120,3 +120,28 @@ def delete_product(
     return {
         "message": "Product deleted successfully"
     }
+def get_related_products(
+    db,
+    product_id: int
+):
+    current_product = (
+        db.query(Product)
+        .filter(
+            Product.id == product_id
+        )
+        .first()
+    )
+
+    if not current_product:
+        return []
+
+    return (
+        db.query(Product)
+        .filter(
+            Product.category_id ==
+            current_product.category_id,
+            Product.id != product_id
+        )
+        .limit(4)
+        .all()
+    )

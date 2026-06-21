@@ -10,90 +10,132 @@ function Orders() {
 
     const fetchOrders = async () => {
         try {
-            const token = localStorage.getItem(
-                "token"
-            );
-
-            const response = await api.get(
-                "/api/v1/orders",
-                {
-                    headers: {
-                        Authorization:
-                            `Bearer ${token}`
-                    }
-                }
-            );
-
+            const token = localStorage.getItem("token");
+            const response = await api.get("/api/v1/orders", {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             setOrders(response.data);
         } catch (error) {
             console.log(error);
         }
     };
 
-    const getStatusColor = (status) => {
+    const getStatusStyle = (status) => {
         switch (status.toLowerCase()) {
-            case 'completed': return 'text-success border-success bg-success bg-opacity-10';
-            case 'pending': return 'text-warning border-warning bg-warning bg-opacity-10';
-            default: return 'text-info border-info bg-info bg-opacity-10';
+            case "completed":
+                return { background: "#f0fdf4", color: "#15803d", border: "1px solid #bbf7d0" };
+            case "pending":
+                return { background: "#fffbeb", color: "#a16207", border: "1px solid #fde68a" };
+            default:
+                return { background: "#eff6ff", color: "#1d4ed8", border: "1px solid #bfdbfe" };
         }
-    }
+    };
 
     return (
-        <div className="container py-5 page-wrapper">
-            <header className="mb-5">
-                <h1 className="fw-800 display-5 mb-0">Order <span className="gradient-text">History</span></h1>
-                <p className="text-white-50 mt-2">Track and manage your past acquisitions.</p>
-            </header>
+        <div className="page-wrapper" style={{ background: "#f8fafc" }}>
+            <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "2rem 1.5rem 3rem" }}>
+                <header style={{ marginBottom: "2rem" }}>
+                    <h1 style={{ fontSize: "1.75rem", fontWeight: 800, marginBottom: "0.25rem" }}>
+                        Order <span className="gradient-text">History</span>
+                    </h1>
+                    <p style={{ color: "#64748b", fontSize: "0.9375rem", margin: 0 }}>
+                        Track and manage your past purchases.
+                    </p>
+                </header>
 
-            {orders.length === 0 ? (
-                <div className="glass-card text-center py-5">
-                    <div className="mb-4">
-                        <span className="fs-1">📦</span>
+                {orders.length === 0 ? (
+                    <div style={{
+                        background: "white",
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "16px",
+                        textAlign: "center",
+                        padding: "3rem 2rem"
+                    }}>
+                        <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>📦</div>
+                        <h3 style={{ fontWeight: 700, marginBottom: "0.5rem" }}>No orders yet</h3>
+                        <p style={{ color: "#64748b", marginBottom: "1.5rem" }}>Your order history will appear here once you make a purchase.</p>
+                        <a href="/products" className="btn btn-primary">Start Shopping</a>
                     </div>
-                    <h3 className="text-white">No orders yet</h3>
-                    <p className="text-white-50">Your order history will appear here once you make a purchase.</p>
-                    <a href="/products" className="btn btn-primary mt-3 px-5">Start Shopping</a>
-                </div>
-            ) : (
-                <div className="row">
-                    <div className="col-12">
+                ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                         {orders.map((order) => (
-                            <div key={order.id} className="glass-card mb-4 p-4 border-0">
-                                <div className="d-flex flex-wrap justify-content-between align-items-center w-100 gap-3">
-                                    <div className="d-flex align-items-center">
-                                        <div className="bg-glass rounded-3 p-3 me-4 d-flex align-items-center justify-content-center" style={{ width: "60px", height: "60px", background: "rgba(255,255,255,0.05)" }}>
-                                            <span className="gradient-text fw-800">#{order.id.toString().slice(-4)}</span>
+                            <div key={order.id} style={{
+                                background: "white",
+                                border: "1px solid #e2e8f0",
+                                borderRadius: "14px",
+                                padding: "1.5rem"
+                            }}>
+                                <div style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    flexWrap: "wrap",
+                                    gap: "1rem",
+                                    marginBottom: "1rem"
+                                }}>
+                                    <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                                        <div style={{
+                                            width: "48px",
+                                            height: "48px",
+                                            borderRadius: "10px",
+                                            background: "#f0fdfa",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            fontWeight: 800,
+                                            color: "#0f766e",
+                                            fontSize: "0.8125rem"
+                                        }}>
+                                            #{String(order.id).slice(-4)}
                                         </div>
                                         <div>
-                                            <h5 className="mb-1 text-white fw-700">Order ID: {order.id}</h5>
-                                            <p className="text-white-50 mb-0 small">Placed on: {new Date().toLocaleDateString()}</p>
+                                            <h5 style={{ fontSize: "0.9375rem", fontWeight: 700, margin: "0 0 0.25rem" }}>
+                                                Order #{order.id}
+                                            </h5>
+                                            <p style={{ color: "#94a3b8", fontSize: "0.8125rem", margin: 0 }}>
+                                                Placed on {new Date().toLocaleDateString()}
+                                            </p>
                                         </div>
                                     </div>
-                                    <div className="d-flex align-items-center gap-4">
-                                        <div className="text-end">
-                                            <div className="small text-white-50 mb-1">Total Amount</div>
-                                            <div className="h4 mb-0 gradient-text fw-800">${order.total_amount}</div>
+
+                                    <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
+                                        <div style={{ textAlign: "right" }}>
+                                            <div style={{ color: "#64748b", fontSize: "0.75rem", marginBottom: "0.25rem" }}>Total</div>
+                                            <div className="price-tag" style={{ fontSize: "1.25rem" }}>${order.total_amount}</div>
                                         </div>
-                                        <div className={`px-4 py-2 rounded-pill border small fw-700 ${getStatusColor(order.status)}`}>
-                                            {order.status.toUpperCase()}
-                                        </div>
+                                        <span style={{
+                                            ...getStatusStyle(order.status),
+                                            padding: "6px 16px",
+                                            borderRadius: "20px",
+                                            fontSize: "0.75rem",
+                                            fontWeight: 700,
+                                            textTransform: "uppercase"
+                                        }}>
+                                            {order.status}
+                                        </span>
                                     </div>
                                 </div>
-                                <hr className="border-secondary my-4 opacity-25" />
-                                <div className="d-flex justify-content-between align-items-center text-white-50 small">
+
+                                <hr style={{ borderColor: "#f1f5f9", margin: "0 0 0.75rem" }} />
+
+                                <div style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    fontSize: "0.8125rem",
+                                    color: "#94a3b8"
+                                }}>
                                     <div>
-                                        <span className="me-3">Shipping: <span className="text-white">Express Delivery</span></span>
-                                        <span>Items: <span className="text-white">3 Units</span></span>
+                                        <span style={{ marginRight: "1rem" }}>
+                                            Shipping: <span style={{ color: "#0f172a", fontWeight: 500 }}>Express Delivery</span>
+                                        </span>
                                     </div>
-                                    <button className="btn btn-link text-white-50 text-decoration-none small p-0 hover-white">
-                                        View Details →
-                                    </button>
                                 </div>
                             </div>
                         ))}
                     </div>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 }

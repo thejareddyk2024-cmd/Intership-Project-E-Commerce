@@ -1,4 +1,4 @@
-from sqlalchemy import String, Integer, DateTime
+from sqlalchemy import String, Integer, DateTime, text
 from sqlalchemy.orm import Mapped, mapped_column
 from datetime import datetime
 
@@ -32,7 +32,9 @@ class User(Base):
 
     role: Mapped[str] = mapped_column(
         String(20),
-        default="customer"
+        default="customer",
+        server_default="customer",
+        nullable=False
     )
 
     created_at: Mapped[datetime] = mapped_column(

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, Query
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -15,7 +16,8 @@ from app.services.product_service import (
     get_product_by_id,
     search_products,
     update_product,
-    delete_product
+    delete_product,
+    get_related_products
 )
 
 from app.core.auth import require_admin
@@ -52,7 +54,7 @@ def read_products(
     min_price: float | None = Query(default=None),
     max_price: float | None = Query(default=None),
     skip: int = Query(default=0),
-    limit: int = Query(default=10),
+    limit: int = Query(default=200),
     db: Session = Depends(get_db)
 ):
     return search_products(
@@ -65,7 +67,6 @@ def read_products(
         limit
     )
 
-
 @router.get(
     "/{product_id}",
     response_model=ProductResponse
@@ -74,10 +75,18 @@ def read_product(
     product_id: int,
     db: Session = Depends(get_db)
 ):
-    return get_product_by_id(
+    product = get_product_by_id(
         db,
         product_id
     )
+
+    if not product:
+        raise HTTPException(
+            status_code=404,
+            detail="Product not found"
+        )
+
+    return product
 
 @router.put(
     "/{product_id}",

@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from app.models.user import User
 from app.schemas.user import UserCreate
-from app.core.security import hash_password
+from app.core.security import hash_password, verify_password
 
 
 def create_user(
@@ -44,8 +44,6 @@ def demote_user(db: Session, user_id: int):
         db.commit()
         db.refresh(user)
     return user
-from app.core.security import verify_password
-from app.models.user import User
 
 
 def get_user_by_email(

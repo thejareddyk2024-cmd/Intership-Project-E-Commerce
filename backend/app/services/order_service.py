@@ -123,3 +123,6 @@ def update_order_status(
     db.refresh(order)
 
     return order
+
+def get_all_orders(db):
+    return db.query(Order).all()

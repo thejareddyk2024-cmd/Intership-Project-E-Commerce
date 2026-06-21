@@ -1,0 +1,29 @@
+services:
+  # The web service
+  - type: web
+    name: shopsmart-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    rootDir: backend
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: shopsmart-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 1440
+      - key: GEMINI_API_KEY
+        value: "add_your_api_key_in_render_dashboard"
+      - key: FRONTEND_URL
+        value: "add_your_vercel_url_here"
+
+databases:
+  # The database service
+  - name: shopsmart-db
+    databaseName: shopsmart
+    user: shopsmart_user

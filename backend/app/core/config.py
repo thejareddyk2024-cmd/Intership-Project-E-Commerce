@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int
 
     GEMINI_API_KEY: str
+    FRONTEND_URL: str = "http://localhost:5173"
 
     class Config:
         env_file = ".env"
