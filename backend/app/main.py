@@ -23,8 +23,24 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Parse FRONTEND_URL to support multiple domains if needed (e.g., comma-separated in env)
-allowed_origins = [origin.strip() for origin in settings.FRONTEND_URL.split(",") if origin.strip()]
+# Parse FRONTEND_URL and make origins robust against trailing slashes
+allowed_origins = []
+if settings.FRONTEND_URL:
+    for origin in settings.FRONTEND_URL.split(","):
+        o = origin.strip()
+        if o:
+            allowed_origins.append(o)
+            # Handle both with and without trailing slash
+            if o.endswith("/"):
+                allowed_origins.append(o.rstrip("/"))
+            else:
+                allowed_origins.append(o + "/")
+
+# Always include common local development origins
+for lo in ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000"]:
+    if lo not in allowed_origins:
+        allowed_origins.append(lo)
+        allowed_origins.append(lo + "/")
 
 app.add_middleware(
     CORSMiddleware,
