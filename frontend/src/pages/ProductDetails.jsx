@@ -12,7 +12,7 @@ function ProductDetails() {
     useEffect(() => {
         fetchProduct();
         fetchReviews();
-    }, []);
+    }, [id]);
 
     const fetchProduct = async () => {
         try {
