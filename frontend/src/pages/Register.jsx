@@ -29,7 +29,14 @@ function Register() {
     };
 
     return (
-        <div className="auth-form-container page-wrapper">
+        <div className="auth-form-container page-wrapper" style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: "85vh",
+            width: "100%",
+            padding: "2rem"
+        }}>
             <div style={{
                 maxWidth: "420px",
                 width: "100%",
