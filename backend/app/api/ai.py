@@ -63,11 +63,18 @@ RESPONSE INSTRUCTIONS (only when user asks about products):
         response = ask_ai(prompt)
     except Exception as e:
         error_msg = str(e)
+        print(f"AI API Error: {error_msg}")
         if "429" in error_msg or "Quota" in error_msg or "exceeded" in error_msg:
-            response = "I'm receiving too many requests right now. Please wait about a minute and try again!"
+            # Fallback mock response so the demo still works when API limit is hit
+            response = "I'm currently receiving too many requests, but here are some popular items you might like:\n\n"
+            if products:
+                # Suggest the first 3 products as a fallback
+                fallback_products = products[:3]
+                response += "Recommended Products\n"
+                for p in fallback_products:
+                    response += f"- {p.name}\n"
         else:
             response = "I'm having trouble connecting to my brain right now. Please try again later."
-        print(f"AI API Error: {error_msg}")
 
     return {
         "response": response
