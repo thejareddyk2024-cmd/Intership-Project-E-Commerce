@@ -74,7 +74,7 @@ function Cart() {
                         <a href="/products" className="btn btn-primary">Explore Products</a>
                     </div>
                 ) : (
-                    <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1.5rem", alignItems: "start" }}>
+                    <div className="cart-layout">
                         {/* Cart Items */}
                         <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
                             {cart.map((item) => (

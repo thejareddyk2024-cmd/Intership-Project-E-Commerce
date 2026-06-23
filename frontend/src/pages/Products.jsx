@@ -147,7 +147,7 @@ function Products() {
                         flexWrap: "wrap",
                         alignItems: "end"
                     }}>
-                        <div style={{ flex: "2", minWidth: "200px" }}>
+                        <div style={{ flex: "2", minWidth: "180px" }}>
                             <label className="form-label">Search</label>
                             <input
                                 type="text"

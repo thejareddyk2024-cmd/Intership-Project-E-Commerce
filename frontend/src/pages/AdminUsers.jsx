@@ -90,58 +90,78 @@ function AdminUsers() {
         }
     };
 
-    return (
-        <div className="container mt-4 page-wrapper">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h1 className="gradient-text fw-bold">User Management</h1>
-                <Link to="/admin/products" className="btn btn-outline-primary rounded-pill">
-                    Manage Products
-                </Link>
-            </div>
+    const getRoleBadgeStyle = (role) => {
+        if (role === "admin") {
+            return { background: "#fef2f2", color: "#b91c1c", border: "1px solid #fecaca" };
+        }
+        return { background: "#f0fdf4", color: "#15803d", border: "1px solid #bbf7d0" };
+    };
 
-            <div className="glass-card p-4">
-                <table className="table table-hover text-white">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Joined</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {users.map((user) => (
-                            <tr key={user.id} className="align-middle">
-                                <td>{user.full_name}</td>
-                                <td>{user.email}</td>
-                                <td>
-                                    <span className={`badge rounded-pill ${user.role === 'admin' ? 'bg-danger' : 'bg-primary'}`}>
-                                        {user.role}
-                                    </span>
-                                </td>
-                                <td>{new Date(user.created_at).toLocaleDateString()}</td>
-                                <td>
-                                    {user.role === "customer" ? (
-                                        <button
-                                            className="btn btn-success btn-sm rounded-pill px-3"
-                                            onClick={() => promote(user.id)}
-                                        >
-                                            Promote to Admin
-                                        </button>
-                                    ) : (
-                                        <button
-                                            className="btn btn-warning btn-sm rounded-pill px-3"
-                                            onClick={() => demote(user.id)}
-                                        >
-                                            Demote to Customer
-                                        </button>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+    return (
+        <div className="page-wrapper" style={{ background: "#f8fafc" }}>
+            <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "2rem 1.5rem 3rem" }}>
+                <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem", flexWrap: "wrap", gap: "1rem" }}>
+                    <h1 style={{ fontSize: "1.75rem", fontWeight: 800, marginBottom: 0 }}>
+                        User <span className="gradient-text">Management</span>
+                    </h1>
+                    <Link to="/admin/products" className="btn btn-outline-primary">
+                        Manage Products
+                    </Link>
+                </header>
+
+                <div className="admin-table-wrapper">
+                    <div className="admin-table-scroll">
+                        <table className="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Joined</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {users.map((user) => (
+                                    <tr key={user.id}>
+                                        <td style={{ fontWeight: 600 }}>{user.full_name}</td>
+                                        <td>{user.email}</td>
+                                        <td>
+                                            <span style={{
+                                                ...getRoleBadgeStyle(user.role),
+                                                padding: "4px 12px",
+                                                borderRadius: "20px",
+                                                fontSize: "0.75rem",
+                                                fontWeight: 700,
+                                                textTransform: "uppercase"
+                                            }}>
+                                                {user.role}
+                                            </span>
+                                        </td>
+                                        <td>{new Date(user.created_at).toLocaleDateString()}</td>
+                                        <td>
+                                            {user.role === "customer" ? (
+                                                <button
+                                                    className="btn btn-primary btn-sm"
+                                                    onClick={() => promote(user.id)}
+                                                >
+                                                    Promote to Admin
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    className="btn btn-outline-primary btn-sm"
+                                                    onClick={() => demote(user.id)}
+                                                >
+                                                    Demote to Customer
+                                                </button>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     );

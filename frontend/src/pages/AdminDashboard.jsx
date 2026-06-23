@@ -33,118 +33,79 @@ function AdminDashboard() {
     if (!stats) {
 
         return (
-            <div className="container mt-5">
-                Loading...
+            <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "3rem 1.5rem", textAlign: "center" }}>
+                <p style={{ color: "#64748b" }}>Loading...</p>
             </div>
         );
 
     }
 
     return (
-        <div className="container py-5">
+        <div className="page-wrapper" style={{ background: "#f8fafc" }}>
+            <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "2rem 1.5rem 3rem" }}>
 
-            <h1 className="mb-5 fw-bold">
-                📊 Admin Dashboard
-            </h1>
+                <header style={{ marginBottom: "2rem" }}>
+                    <h1 style={{ fontSize: "1.75rem", fontWeight: 800, marginBottom: "0.25rem" }}>
+                        📊 Admin <span className="gradient-text">Dashboard</span>
+                    </h1>
+                    <p style={{ color: "#64748b", fontSize: "0.9375rem", margin: 0 }}>
+                        Overview of your store performance.
+                    </p>
+                </header>
 
-            <div className="row g-4">
+                <div className="admin-stats-grid">
+                    <div className="card" style={{ padding: "1.5rem", textAlign: "center" }}>
+                        <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>📦</div>
+                        <h3 style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "0.25rem" }}>{stats.total_products}</h3>
+                        <p style={{ color: "#64748b", fontSize: "0.875rem", margin: 0 }}>Products</p>
+                    </div>
 
-                <div className="col-md-3">
-                    <div className="card p-4 text-center h-100 shadow">
-                        <h2>📦</h2>
-                        <h3>{stats.total_products}</h3>
-                        <p className="mb-0">
-                            Products
-                        </p>
+                    <div className="card" style={{ padding: "1.5rem", textAlign: "center" }}>
+                        <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>👥</div>
+                        <h3 style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "0.25rem" }}>{stats.total_users}</h3>
+                        <p style={{ color: "#64748b", fontSize: "0.875rem", margin: 0 }}>Users</p>
+                    </div>
+
+                    <div className="card" style={{ padding: "1.5rem", textAlign: "center" }}>
+                        <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>🛒</div>
+                        <h3 style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "0.25rem" }}>{stats.total_orders}</h3>
+                        <p style={{ color: "#64748b", fontSize: "0.875rem", margin: 0 }}>Orders</p>
+                    </div>
+
+                    <div className="card" style={{ padding: "1.5rem", textAlign: "center" }}>
+                        <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>💰</div>
+                        <h3 style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "0.25rem" }}>${stats.total_revenue}</h3>
+                        <p style={{ color: "#64748b", fontSize: "0.875rem", margin: 0 }}>Revenue</p>
                     </div>
                 </div>
 
-                <div className="col-md-3">
-                    <div className="card p-4 text-center h-100 shadow">
-                        <h2>👥</h2>
-                        <h3>{stats.total_users}</h3>
-                        <p className="mb-0">
-                            Users
-                        </p>
-                    </div>
-                </div>
-
-                <div className="col-md-3">
-                    <div className="card p-4 text-center h-100 shadow">
-                        <h2>🛒</h2>
-                        <h3>{stats.total_orders}</h3>
-                        <p className="mb-0">
-                            Orders
-                        </p>
-                    </div>
-                </div>
-
-                <div className="col-md-3">
-                    <div className="card p-4 text-center h-100 shadow">
-                        <h2>💰</h2>
-                        <h3>
-                            ${stats.total_revenue}
-                        </h3>
-                        <p className="mb-0">
-                            Revenue
-                        </p>
-                    </div>
-                </div>
-
-            </div>
-
-            <div className="row g-4 mt-3">
-
-                <div className="col-md-6">
-
-                    <div className="card p-4 h-100 shadow">
-
-                        <h3 className="mb-3">
+                <div className="admin-info-grid">
+                    <div className="card" style={{ padding: "1.5rem" }}>
+                        <h4 style={{ fontWeight: 700, marginBottom: "0.75rem", fontSize: "1rem" }}>
                             ⭐ Top Rated Product
-                        </h3>
-
-                        <h4>
+                        </h4>
+                        <h5 style={{ fontWeight: 600, marginBottom: "0.5rem" }}>
                             {stats.top_rated_product}
-                        </h4>
-
-                        <p className="text-muted mb-0">
-                            Average Rating:
-                            {" "}
-                            {stats.top_rated_score}
-                            {" "}
-                            ⭐
+                        </h5>
+                        <p style={{ color: "#64748b", fontSize: "0.875rem", margin: 0 }}>
+                            Average Rating: {stats.top_rated_score} ⭐
                         </p>
-
                     </div>
 
-                </div>
-
-                <div className="col-md-6">
-
-                    <div className="card p-4 h-100 shadow">
-
-                        <h3 className="mb-3">
+                    <div className="card" style={{ padding: "1.5rem" }}>
+                        <h4 style={{ fontWeight: 700, marginBottom: "0.75rem", fontSize: "1rem" }}>
                             ❤️ Most Wishlisted Product
-                        </h3>
-
-                        <h4>
-                            {stats.most_wishlisted_product}
                         </h4>
-
-                        <p className="text-muted mb-0">
-                            Wishlisted
-                            {" "}
-                            {stats.wishlist_count}
-                            {" "}
-                            times
+                        <h5 style={{ fontWeight: 600, marginBottom: "0.5rem" }}>
+                            {stats.most_wishlisted_product}
+                        </h5>
+                        <p style={{ color: "#64748b", fontSize: "0.875rem", margin: 0 }}>
+                            Wishlisted {stats.wishlist_count} times
                         </p>
-
                     </div>
-
                 </div>
 
             </div>
-
         </div>
     );
 }

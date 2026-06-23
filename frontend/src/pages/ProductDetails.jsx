@@ -97,10 +97,7 @@ function ProductDetails() {
             <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "2rem 1.5rem 3rem" }}>
 
                 {/* ── Product Main ────────────────────────────── */}
-                <div style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: "2.5rem",
+                <div className="product-detail-grid" style={{
                     marginBottom: "3rem"
                 }}>
                     {/* Image */}
@@ -114,7 +111,7 @@ function ProductDetails() {
                         <img
                             src={product.image_url || "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=400&fit=crop"}
                             alt={product.name}
-                            style={{ width: "100%", height: "400px", objectFit: "cover" }}
+                            style={{ width: "100%", maxHeight: "400px", objectFit: "cover" }}
                         />
                     </div>
 

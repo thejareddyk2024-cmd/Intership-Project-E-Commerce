@@ -130,6 +130,7 @@ function AIWidget() {
     return (
         <>
             <button
+                className="ai-widget-fab"
                 onClick={() =>
                     setOpen(!open)
                 }
@@ -155,6 +156,7 @@ function AIWidget() {
             </button>
 
             <div
+                className="ai-widget-panel"
                 style={{
                     position: "fixed",
                     bottom: "105px",

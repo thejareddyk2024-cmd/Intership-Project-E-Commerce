@@ -63,9 +63,9 @@ function Wishlist() {
                         <a href="/products" className="btn btn-primary">Browse Products</a>
                     </div>
                 ) : (
-                    <div style={{
+                    <div className="wishlist-grid" style={{
                         display: "grid",
-                        gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+                        gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
                         gap: "1rem"
                     }}>
                         {wishlist.map((item) => (
