@@ -8,7 +8,8 @@ from sqlalchemy import (
 
 from sqlalchemy.orm import (
     Mapped,
-    mapped_column
+    mapped_column,
+    relationship
 )
 
 from app.database.base import Base
@@ -40,3 +41,5 @@ class Cart(Base):
         DateTime,
         default=datetime.utcnow
     )
+
+    product = relationship("Product")

@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import { Package, ArrowRight, Clock, CheckCircle2, AlertCircle } from "lucide-react";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 function Orders() {
     const [orders, setOrders] = useState([]);
@@ -20,123 +23,145 @@ function Orders() {
         }
     };
 
-    const getStatusStyle = (status) => {
+    const getStatusConfig = (status) => {
         switch (status.toLowerCase()) {
             case "completed":
-                return { background: "#f0fdf4", color: "#15803d", border: "1px solid #bbf7d0" };
+                return { 
+                    bg: "bg-green-50 dark:bg-green-900/20", 
+                    text: "text-green-700 dark:text-green-400", 
+                    border: "border-green-200 dark:border-green-800/50",
+                    icon: <CheckCircle2 size={16} />
+                };
             case "pending":
-                return { background: "#fffbeb", color: "#a16207", border: "1px solid #fde68a" };
+                return { 
+                    bg: "bg-amber-50 dark:bg-amber-900/20", 
+                    text: "text-amber-700 dark:text-amber-500", 
+                    border: "border-amber-200 dark:border-amber-800/50",
+                    icon: <Clock size={16} />
+                };
             default:
-                return { background: "#eff6ff", color: "#1d4ed8", border: "1px solid #bfdbfe" };
+                return { 
+                    bg: "bg-blue-50 dark:bg-blue-900/20", 
+                    text: "text-blue-700 dark:text-blue-400", 
+                    border: "border-blue-200 dark:border-blue-800/50",
+                    icon: <AlertCircle size={16} />
+                };
         }
     };
 
     return (
-        <div className="page-wrapper" style={{ background: "#f8fafc" }}>
-            <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "2rem 1.5rem 3rem" }}>
-                <header style={{ marginBottom: "2rem" }}>
-                    <h1 style={{ fontSize: "1.75rem", fontWeight: 800, marginBottom: "0.25rem" }}>
-                        Order <span className="gradient-text">History</span>
-                    </h1>
-                    <p style={{ color: "#64748b", fontSize: "0.9375rem", margin: 0 }}>
-                        Track and manage your past purchases.
-                    </p>
-                </header>
+        <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
+        >
+            <header className="mb-10">
+                <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-2">
+                    Order <span className="bg-gradient-to-r from-brand-600 to-brand-400 bg-clip-text text-transparent">History</span>
+                </h1>
+                <p className="text-slate-500 dark:text-slate-400">
+                    Track and manage your past purchases.
+                </p>
+            </header>
 
-                {orders.length === 0 ? (
-                    <div style={{
-                        background: "white",
-                        border: "1px solid #e2e8f0",
-                        borderRadius: "16px",
-                        textAlign: "center",
-                        padding: "3rem 2rem"
-                    }}>
-                        <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>📦</div>
-                        <h3 style={{ fontWeight: 700, marginBottom: "0.5rem" }}>No orders yet</h3>
-                        <p style={{ color: "#64748b", marginBottom: "1.5rem" }}>Your order history will appear here once you make a purchase.</p>
-                        <a href="/products" className="btn btn-primary">Start Shopping</a>
+            {orders.length === 0 ? (
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-3xl text-center py-24 px-4 shadow-sm"
+                >
+                    <div className="inline-flex items-center justify-center w-24 h-24 bg-brand-50 dark:bg-brand-900/20 rounded-full mb-6 text-brand-500 dark:text-brand-400">
+                        <Package size={40} />
                     </div>
-                ) : (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                        {orders.map((order) => (
-                            <div key={order.id} style={{
-                                background: "white",
-                                border: "1px solid #e2e8f0",
-                                borderRadius: "14px",
-                                padding: "1.5rem"
-                            }}>
-                                <div style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                    flexWrap: "wrap",
-                                    gap: "1rem",
-                                    marginBottom: "1rem"
-                                }}>
-                                    <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                                        <div style={{
-                                            width: "48px",
-                                            height: "48px",
-                                            borderRadius: "10px",
-                                            background: "#f0fdfa",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                            fontWeight: 800,
-                                            color: "#0f766e",
-                                            fontSize: "0.8125rem"
-                                        }}>
+                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">No orders yet</h3>
+                    <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-md mx-auto">
+                        Your order history will appear here once you make a purchase.
+                    </p>
+                    <Link to="/products" className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 dark:bg-brand-600 dark:hover:bg-brand-500 text-white py-3 px-8 rounded-xl font-bold transition-all shadow-md active:scale-95">
+                        Start Shopping <ArrowRight size={18} />
+                    </Link>
+                </motion.div>
+            ) : (
+                <div className="flex flex-col gap-6">
+                    {orders.map((order, index) => {
+                        const statusConfig = getStatusConfig(order.status);
+                        return (
+                            <motion.div 
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.1 }}
+                                key={order.id} 
+                                className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow"
+                            >
+                                <div className="flex flex-wrap justify-between items-center gap-6 mb-6">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-14 h-14 rounded-xl bg-brand-50 dark:bg-brand-900/30 flex items-center justify-center font-bold text-brand-700 dark:text-brand-400 border border-brand-100 dark:border-brand-800/50">
                                             #{String(order.id).slice(-4)}
                                         </div>
                                         <div>
-                                            <h5 style={{ fontSize: "0.9375rem", fontWeight: 700, margin: "0 0 0.25rem" }}>
+                                            <h5 className="font-bold text-slate-900 dark:text-white text-lg mb-1">
                                                 Order #{order.id}
                                             </h5>
-                                            <p style={{ color: "#94a3b8", fontSize: "0.8125rem", margin: 0 }}>
+                                            <p className="text-slate-500 dark:text-slate-400 text-sm">
                                                 Placed on {new Date().toLocaleDateString()}
                                             </p>
                                         </div>
                                     </div>
 
-                                    <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-                                        <div style={{ textAlign: "right" }}>
-                                            <div style={{ color: "#64748b", fontSize: "0.75rem", marginBottom: "0.25rem" }}>Total</div>
-                                            <div className="price-tag" style={{ fontSize: "1.25rem" }}>${order.total_amount}</div>
+                                    <div className="flex items-center gap-6">
+                                        <div className="text-right">
+                                            <div className="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">Total</div>
+                                            <div className="text-2xl font-extrabold text-brand-600 dark:text-brand-400">${order.total_amount}</div>
                                         </div>
-                                        <span style={{
-                                            ...getStatusStyle(order.status),
-                                            padding: "6px 16px",
-                                            borderRadius: "20px",
-                                            fontSize: "0.75rem",
-                                            fontWeight: 700,
-                                            textTransform: "uppercase"
-                                        }}>
+                                        <div className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider border ${statusConfig.bg} ${statusConfig.text} ${statusConfig.border}`}>
+                                            {statusConfig.icon}
                                             {order.status}
-                                        </span>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <hr style={{ borderColor: "#f1f5f9", margin: "0 0 0.75rem" }} />
-
-                                <div style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                    fontSize: "0.8125rem",
-                                    color: "#94a3b8"
-                                }}>
-                                    <div>
-                                        <span style={{ marginRight: "1rem" }}>
-                                            Shipping: <span style={{ color: "#0f172a", fontWeight: 500 }}>Express Delivery</span>
-                                        </span>
+                                <div className="border-t border-slate-100 dark:border-slate-700/50 pt-4 mt-4">
+                                    <div className="flex justify-between items-center text-sm text-slate-500 dark:text-slate-400 mb-4">
+                                        <div>
+                                            <span className="mr-4">
+                                                Shipping: <span className="text-slate-900 dark:text-slate-200 font-medium">Express Delivery</span>
+                                            </span>
+                                        </div>
                                     </div>
+                                    {order.items && order.items.length > 0 && (
+                                        <div>
+                                            <h6 className="text-sm font-bold text-slate-900 dark:text-white mb-3">Items in this order:</h6>
+                                            <div className="space-y-3">
+                                                {order.items.map((item) => (
+                                                    <div key={item.id} className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center overflow-hidden shrink-0">
+                                                                {item.product?.image_url ? (
+                                                                    <img src={item.product.image_url} alt={item.product.name} className="w-full h-full object-cover" />
+                                                                ) : (
+                                                                    <Package size={16} className="text-slate-400" />
+                                                                )}
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">{item.product?.name || `Product #${item.product_id}`}</p>
+                                                                <p className="text-xs text-slate-500 dark:text-slate-400">Qty: {item.quantity}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-sm font-bold text-slate-900 dark:text-white">
+                                                            ${(item.price * item.quantity).toFixed(2)}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
-        </div>
+                            </motion.div>
+                        );
+                    })}
+                </div>
+            )}
+        </motion.div>
     );
 }
 

@@ -10,7 +10,8 @@ from sqlalchemy import (
 
 from sqlalchemy.orm import (
     Mapped,
-    mapped_column
+    mapped_column,
+    relationship
 )
 
 from app.database.base import Base
@@ -43,3 +44,5 @@ class Order(Base):
         DateTime,
         default=datetime.utcnow
     )
+
+    items = relationship("OrderItem")

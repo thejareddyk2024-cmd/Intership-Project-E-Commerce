@@ -18,14 +18,17 @@ import AIWidget from "./components/AIWidget";
 import ProductDetails from "./pages/ProductDetails";
 import AdminDashboard from "./pages/AdminDashboard";
 
+import { ThemeProvider } from "./components/ThemeProvider";
+
 function App() {
     return (
-        <BrowserRouter>
-            <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-                <Navbar />
+        <ThemeProvider defaultTheme="system">
+            <BrowserRouter>
+                <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+                    <Navbar />
 
-                <main style={{ flex: 1 }}>
-                    <Routes>
+                    <main className="flex-1">
+                        <Routes>
                         <Route path="/" element={<Login />} />
                         <Route path="/register" element={<Register />} />
                         <Route path="/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
@@ -73,8 +76,9 @@ function App() {
 
                 <Footer />
                 <AIWidget />
-            </div>
-        </BrowserRouter>
+                </div>
+            </BrowserRouter>
+        </ThemeProvider>
     );
 }
 

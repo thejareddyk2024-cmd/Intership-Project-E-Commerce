@@ -75,4 +75,4 @@ app.include_router(
 )
 app.include_router(
     analytics_router
-)
+)

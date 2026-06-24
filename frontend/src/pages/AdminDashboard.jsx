@@ -1,112 +1,151 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import { Package, Users, ShoppingCart, DollarSign, Star, Heart, TrendingUp } from "lucide-react";
+import { motion } from "framer-motion";
 
 function AdminDashboard() {
-
-    const [stats, setStats] =
-        useState(null);
+    const [stats, setStats] = useState(null);
 
     useEffect(() => {
         fetchStats();
     }, []);
 
     const fetchStats = async () => {
-
         try {
-
-            const response =
-                await api.get(
-                    "/api/v1/analytics/dashboard"
-                );
-
-            setStats(
-                response.data
-            );
-
+            const response = await api.get("/api/v1/analytics/dashboard");
+            setStats(response.data);
         } catch (error) {
-
             console.log(error);
-
         }
     };
 
     if (!stats) {
-
         return (
-            <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "3rem 1.5rem", textAlign: "center" }}>
-                <p style={{ color: "#64748b" }}>Loading...</p>
+            <div className="flex justify-center items-center min-h-[50vh]">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-brand-500 border-t-transparent"></div>
             </div>
         );
-
     }
 
-    return (
-        <div className="page-wrapper" style={{ background: "#f8fafc" }}>
-            <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "2rem 1.5rem 3rem" }}>
+    const statCards = [
+        {
+            title: "Total Products",
+            value: stats.total_products,
+            icon: <Package size={24} />,
+            color: "blue"
+        },
+        {
+            title: "Total Users",
+            value: stats.total_users,
+            icon: <Users size={24} />,
+            color: "purple"
+        },
+        {
+            title: "Total Orders",
+            value: stats.total_orders,
+            icon: <ShoppingCart size={24} />,
+            color: "brand"
+        },
+        {
+            title: "Total Revenue",
+            value: `$${stats.total_revenue}`,
+            icon: <DollarSign size={24} />,
+            color: "emerald"
+        }
+    ];
 
-                <header style={{ marginBottom: "2rem" }}>
-                    <h1 style={{ fontSize: "1.75rem", fontWeight: 800, marginBottom: "0.25rem" }}>
-                        📊 Admin <span className="gradient-text">Dashboard</span>
+    const getColorClasses = (color) => {
+        switch (color) {
+            case "blue": return "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-800/50";
+            case "purple": return "bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-800/50";
+            case "brand": return "bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 border-brand-100 dark:border-brand-800/50";
+            case "emerald": return "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800/50";
+            default: return "bg-slate-50 dark:bg-slate-900/20 text-slate-600 dark:text-slate-400 border-slate-100 dark:border-slate-800/50";
+        }
+    };
+
+    return (
+        <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
+        >
+            <header className="mb-10 flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-2 flex items-center gap-3">
+                        <TrendingUp className="text-brand-500" />
+                        Admin <span className="bg-gradient-to-r from-brand-600 to-brand-400 bg-clip-text text-transparent">Dashboard</span>
                     </h1>
-                    <p style={{ color: "#64748b", fontSize: "0.9375rem", margin: 0 }}>
+                    <p className="text-slate-500 dark:text-slate-400">
                         Overview of your store performance.
                     </p>
-                </header>
-
-                <div className="admin-stats-grid">
-                    <div className="card" style={{ padding: "1.5rem", textAlign: "center" }}>
-                        <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>📦</div>
-                        <h3 style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "0.25rem" }}>{stats.total_products}</h3>
-                        <p style={{ color: "#64748b", fontSize: "0.875rem", margin: 0 }}>Products</p>
-                    </div>
-
-                    <div className="card" style={{ padding: "1.5rem", textAlign: "center" }}>
-                        <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>👥</div>
-                        <h3 style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "0.25rem" }}>{stats.total_users}</h3>
-                        <p style={{ color: "#64748b", fontSize: "0.875rem", margin: 0 }}>Users</p>
-                    </div>
-
-                    <div className="card" style={{ padding: "1.5rem", textAlign: "center" }}>
-                        <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>🛒</div>
-                        <h3 style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "0.25rem" }}>{stats.total_orders}</h3>
-                        <p style={{ color: "#64748b", fontSize: "0.875rem", margin: 0 }}>Orders</p>
-                    </div>
-
-                    <div className="card" style={{ padding: "1.5rem", textAlign: "center" }}>
-                        <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>💰</div>
-                        <h3 style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "0.25rem" }}>${stats.total_revenue}</h3>
-                        <p style={{ color: "#64748b", fontSize: "0.875rem", margin: 0 }}>Revenue</p>
-                    </div>
                 </div>
+            </header>
 
-                <div className="admin-info-grid">
-                    <div className="card" style={{ padding: "1.5rem" }}>
-                        <h4 style={{ fontWeight: 700, marginBottom: "0.75rem", fontSize: "1rem" }}>
-                            ⭐ Top Rated Product
-                        </h4>
-                        <h5 style={{ fontWeight: 600, marginBottom: "0.5rem" }}>
-                            {stats.top_rated_product}
-                        </h5>
-                        <p style={{ color: "#64748b", fontSize: "0.875rem", margin: 0 }}>
-                            Average Rating: {stats.top_rated_score} ⭐
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                {statCards.map((card, index) => (
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        key={card.title} 
+                        className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow"
+                    >
+                        <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl mb-4 border ${getColorClasses(card.color)}`}>
+                            {card.icon}
+                        </div>
+                        <h3 className="text-3xl font-black text-slate-900 dark:text-white mb-1 tracking-tight">
+                            {card.value}
+                        </h3>
+                        <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">
+                            {card.title}
                         </p>
-                    </div>
-
-                    <div className="card" style={{ padding: "1.5rem" }}>
-                        <h4 style={{ fontWeight: 700, marginBottom: "0.75rem", fontSize: "1rem" }}>
-                            ❤️ Most Wishlisted Product
-                        </h4>
-                        <h5 style={{ fontWeight: 600, marginBottom: "0.5rem" }}>
-                            {stats.most_wishlisted_product}
-                        </h5>
-                        <p style={{ color: "#64748b", fontSize: "0.875rem", margin: 0 }}>
-                            Wishlisted {stats.wishlist_count} times
-                        </p>
-                    </div>
-                </div>
-
+                    </motion.div>
+                ))}
             </div>
-        </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <motion.div 
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-8 shadow-sm flex flex-col items-center text-center group"
+                >
+                    <div className="w-16 h-16 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <Star size={32} className="fill-current" />
+                    </div>
+                    <h4 className="text-lg font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">
+                        Top Rated Product
+                    </h4>
+                    <h5 className="text-2xl font-extrabold text-slate-900 dark:text-white mb-4 line-clamp-1">
+                        {stats.top_rated_product}
+                    </h5>
+                    <div className="inline-flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-500 px-4 py-2 rounded-full font-bold">
+                        Average Rating: {stats.top_rated_score} <Star size={16} className="fill-current" />
+                    </div>
+                </motion.div>
+
+                <motion.div 
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-8 shadow-sm flex flex-col items-center text-center group"
+                >
+                    <div className="w-16 h-16 rounded-full bg-red-50 dark:bg-red-900/20 text-red-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <Heart size={32} className="fill-current" />
+                    </div>
+                    <h4 className="text-lg font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">
+                        Most Wishlisted
+                    </h4>
+                    <h5 className="text-2xl font-extrabold text-slate-900 dark:text-white mb-4 line-clamp-1">
+                        {stats.most_wishlisted_product}
+                    </h5>
+                    <div className="inline-flex items-center gap-2 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-4 py-2 rounded-full font-bold">
+                        Wishlisted {stats.wishlist_count} times
+                    </div>
+                </motion.div>
+            </div>
+        </motion.div>
     );
 }
 

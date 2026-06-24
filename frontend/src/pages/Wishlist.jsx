@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import { Trash2, Heart, ArrowRight, Eye } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
 
 function Wishlist() {
     const [wishlist, setWishlist] = useState([]);
@@ -29,8 +32,7 @@ function Wishlist() {
             await api.delete(`/api/v1/wishlist/${wishlistId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            alert("Removed from wishlist");
-            fetchWishlist();
+            setWishlist(prev => prev.filter(item => item.id !== wishlistId));
         } catch (error) {
             console.log(error);
             alert(error.response?.data?.detail || "Failed to remove item");
@@ -38,100 +40,99 @@ function Wishlist() {
     };
 
     return (
-        <div className="page-wrapper" style={{ background: "#f8fafc" }}>
-            <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "2rem 1.5rem 3rem" }}>
-                <header style={{ marginBottom: "2rem" }}>
-                    <h1 style={{ fontSize: "1.75rem", fontWeight: 800, marginBottom: "0.25rem" }}>
-                        Saved <span className="gradient-text">Favorites</span>
-                    </h1>
-                    <p style={{ color: "#64748b", fontSize: "0.9375rem", margin: 0 }}>
-                        Your personal collection of favorite tech products.
-                    </p>
-                </header>
+        <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
+        >
+            <header className="mb-10">
+                <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-2">
+                    Saved <span className="bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent">Favorites</span>
+                </h1>
+                <p className="text-slate-500 dark:text-slate-400">
+                    Your personal collection of favorite tech products.
+                </p>
+            </header>
 
-                {wishlist.length === 0 ? (
-                    <div style={{
-                        background: "white",
-                        border: "1px solid #e2e8f0",
-                        borderRadius: "16px",
-                        textAlign: "center",
-                        padding: "3rem 2rem"
-                    }}>
-                        <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>✨</div>
-                        <h3 style={{ fontWeight: 700, marginBottom: "0.5rem" }}>Your wishlist is waiting</h3>
-                        <p style={{ color: "#64748b", marginBottom: "1.5rem" }}>Save items you love to find them later.</p>
-                        <a href="/products" className="btn btn-primary">Browse Products</a>
+            {wishlist.length === 0 ? (
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-3xl text-center py-24 px-4 shadow-sm"
+                >
+                    <div className="inline-flex items-center justify-center w-24 h-24 bg-red-50 dark:bg-red-900/20 rounded-full mb-6 text-red-500 dark:text-red-400">
+                        <Heart size={40} className="fill-current opacity-20" />
+                        <Heart size={40} className="absolute" />
                     </div>
-                ) : (
-                    <div className="wishlist-grid" style={{
-                        display: "grid",
-                        gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-                        gap: "1rem"
-                    }}>
+                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">Your wishlist is waiting</h3>
+                    <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-md mx-auto">
+                        Save items you love to find them later and keep track of your most wanted tech.
+                    </p>
+                    <Link to="/products" className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 dark:bg-brand-600 dark:hover:bg-brand-500 text-white py-3 px-8 rounded-xl font-bold transition-all shadow-md active:scale-95">
+                        Browse Products <ArrowRight size={18} />
+                    </Link>
+                </motion.div>
+            ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <AnimatePresence>
                         {wishlist.map((item) => (
-                            <div key={item.id} style={{
-                                background: "white",
-                                border: "1px solid #e2e8f0",
-                                borderRadius: "14px",
-                                padding: "1.5rem",
-                                transition: "box-shadow 0.3s, transform 0.3s",
-                                display: "flex",
-                                flexDirection: "column"
-                            }}
-                                className="product-card"
+                            <motion.div 
+                                layout
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                                key={item.id} 
+                                className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 flex flex-col shadow-sm hover:shadow-md transition-shadow group"
                             >
-                                <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1rem", flex: 1 }}>
-                                    <div style={{
-                                        width: "80px",
-                                        height: "80px",
-                                        borderRadius: "10px",
-                                        background: "#f8fafc",
-                                        overflow: "hidden",
-                                        flexShrink: 0
-                                    }}>
+                                <div className="flex gap-4 mb-5 flex-1">
+                                    <div className="w-24 h-24 rounded-xl bg-slate-100 dark:bg-slate-900 overflow-hidden shrink-0 border border-slate-100 dark:border-slate-700">
                                         {item.product?.image_url ? (
                                             <img 
                                                 src={item.product.image_url} 
                                                 alt={item.product.name} 
-                                                style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
                                             />
                                         ) : (
-                                            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#e2e8f0", color: "#64748b" }}>
+                                            <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs font-medium">
                                                 No Img
                                             </div>
                                         )}
                                     </div>
-                                    <div>
-                                        <h5 style={{ fontSize: "1.05rem", fontWeight: 700, margin: "0 0 0.25rem", color: "#0f172a" }}>
+                                    <div className="flex flex-col">
+                                        <h5 className="font-bold text-slate-900 dark:text-white leading-tight mb-1 line-clamp-2">
                                             {item.product?.name || `Product #${item.product_id}`}
                                         </h5>
-                                        <p style={{ color: "#0f766e", fontWeight: 700, fontSize: "0.9375rem", margin: "0 0 0.25rem" }}>
+                                        <p className="font-extrabold text-brand-600 dark:text-brand-400 mb-2">
                                             ${item.product?.price}
                                         </p>
-                                        <p style={{ color: "#94a3b8", fontSize: "0.8125rem", margin: 0 }}>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-auto">
                                             Added to favorites
                                         </p>
                                     </div>
                                 </div>
 
-                                <div style={{ display: "flex", gap: "0.5rem" }}>
-                                    <a href={`/product/${item.product_id}`} className="btn btn-outline-primary" style={{ flex: 1, textDecoration: "none", textAlign: "center", fontSize: "0.8125rem" }}>
-                                        View Product
-                                    </a>
-                                    <button
-                                        className="btn btn-danger"
-                                        onClick={() => removeFromWishlist(item.id)}
-                                        style={{ fontSize: "0.8125rem" }}
+                                <div className="flex gap-2 mt-auto">
+                                    <Link 
+                                        to={`/product/${item.product_id}`} 
+                                        className="flex-1 flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 py-2.5 px-3 rounded-xl font-semibold text-sm transition-colors"
                                     >
-                                        Remove
+                                        <Eye size={16} />
+                                        View
+                                    </Link>
+                                    <button
+                                        onClick={() => removeFromWishlist(item.id)}
+                                        className="flex items-center justify-center p-2.5 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 rounded-xl transition-colors"
+                                        aria-label="Remove from wishlist"
+                                    >
+                                        <Trash2 size={18} />
                                     </button>
                                 </div>
-                            </div>
+                            </motion.div>
                         ))}
-                    </div>
-                )}
-            </div>
-        </div>
+                    </AnimatePresence>
+                </div>
+            )}
+        </motion.div>
     );
 }
 

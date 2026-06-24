@@ -6,7 +6,8 @@ from sqlalchemy import (
 
 from sqlalchemy.orm import (
     Mapped,
-    mapped_column
+    mapped_column,
+    relationship
 )
 
 from app.database.base import Base
@@ -38,3 +39,5 @@ class OrderItem(Base):
         Float,
         default=0
     )
+
+    product = relationship("Product")
