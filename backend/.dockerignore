@@ -1,0 +1,15 @@
+venv/
+__pycache__/
+*.pyc
+.env
+.env.local
+*.egg-info/
+dist/
+build/
+debug_ai.py
+error_log.txt
+list_models.py
+response.json
+test_*.py
+seed_products.py
+update_images.py

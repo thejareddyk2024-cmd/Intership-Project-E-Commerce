@@ -4,6 +4,7 @@ from fastapi import Depends
 
 from app.database.dependencies import get_db
 from app.models.product import Product
+from app.core.redis import cache
 
 from app.services.ai_service import (
     ask_ai
@@ -20,6 +21,13 @@ def chat_with_ai(
     data: dict,
     db: Session = Depends(get_db)
 ):
+    user_message = data["message"]
+
+    # Check if we have a cached response for this exact message
+    cache_key = f"ai:chat:{cache.make_hash(user_message)}"
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
 
     products = db.query(Product).all()
 
@@ -42,7 +50,7 @@ You are ShopSmart AI, a helpful shopping assistant for an e-commerce tech store.
 </CATALOG_OF_AVAILABLE_PRODUCTS>
 
 <USER_MESSAGE>
-{data["message"]}
+{user_message}
 </USER_MESSAGE>
 
 INSTRUCTIONS:
@@ -71,6 +79,9 @@ INSTRUCTIONS:
         else:
             response = "I'm having trouble connecting to my brain right now. Please try again later."
 
-    return {
-        "response": response
-    }
+    result = {"response": response}
+
+    # Cache the AI response for 10 minutes
+    cache.set(cache_key, result, ttl=600)
+
+    return result
