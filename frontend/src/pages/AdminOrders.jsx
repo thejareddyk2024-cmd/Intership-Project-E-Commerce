@@ -151,7 +151,7 @@ function AdminOrders() {
                                                 {new Date(order.created_at).toLocaleDateString()}
                                             </td>
                                             <td className="py-4 px-6 text-sm font-extrabold text-brand-600 dark:text-brand-400">
-                                                ${order.total_amount}
+                                                ${Number(order.total_amount).toFixed(2)}
                                             </td>
                                             <td className="py-4 px-6">
                                                 <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${statusConfig.bg} ${statusConfig.text} ${statusConfig.border}`}>

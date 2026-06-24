@@ -111,7 +111,7 @@ function Orders() {
                                     <div className="flex items-center gap-6">
                                         <div className="text-right">
                                             <div className="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">Total</div>
-                                            <div className="text-2xl font-extrabold text-brand-600 dark:text-brand-400">${order.total_amount}</div>
+                                            <div className="text-2xl font-extrabold text-brand-600 dark:text-brand-400">${Number(order.total_amount).toFixed(2)}</div>
                                         </div>
                                         <div className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider border ${statusConfig.bg} ${statusConfig.text} ${statusConfig.border}`}>
                                             {statusConfig.icon}

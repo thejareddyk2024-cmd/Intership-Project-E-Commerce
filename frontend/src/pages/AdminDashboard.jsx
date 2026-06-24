@@ -48,7 +48,7 @@ function AdminDashboard() {
         },
         {
             title: "Total Revenue",
-            value: `$${stats.total_revenue}`,
+            value: `$${Number(stats.total_revenue).toFixed(2)}`,
             icon: <DollarSign size={24} />,
             color: "emerald"
         }
