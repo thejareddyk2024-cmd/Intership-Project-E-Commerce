@@ -39,11 +39,16 @@ function Cart() {
     const checkout = async () => {
         try {
             const token = localStorage.getItem("token");
-            await api.post("/api/v1/orders/checkout", {}, {
+            const response = await api.post("/api/v1/orders/checkout", {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            alert("Order placed successfully!");
-            fetchCart();
+            
+            if (response.data.checkout_url) {
+                // Redirect to Stripe or simulated URL
+                window.location.href = response.data.checkout_url;
+            } else {
+                alert("Checkout failed: No checkout URL provided");
+            }
         } catch (error) {
             console.log(error);
             alert(error.response?.data?.detail || "Checkout failed");

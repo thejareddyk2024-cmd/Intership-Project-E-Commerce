@@ -9,6 +9,8 @@ class Settings(BaseSettings):
 
     GEMINI_API_KEY: str
     REDIS_URL: str = ""
+    STRIPE_SECRET_KEY: str = ""
+    STRIPE_PUBLISHABLE_KEY: str = ""
     FRONTEND_URL: str = "http://localhost:5173"
 
     class Config:

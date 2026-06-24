@@ -6,6 +6,7 @@ import Products from "./pages/Products";
 import Wishlist from "./pages/Wishlist";
 import Cart from "./pages/Cart";
 import Orders from "./pages/Orders";
+import CheckoutSuccess from "./pages/CheckoutSuccess";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -34,6 +35,7 @@ function App() {
                         <Route path="/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
                         <Route path="/wishlist" element={<Wishlist />} />
                         <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+                        <Route path="/checkout/success" element={<ProtectedRoute><CheckoutSuccess /></ProtectedRoute>} />
                         <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
                         <Route
                             path="/admin-dashboard"

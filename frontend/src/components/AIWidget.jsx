@@ -11,14 +11,23 @@ function AIWidget() {
     const [chat, setChat] = useState([
         {
             sender: "ai",
-            text: "👋 Hi! I'm ShopSmart AI. Ask me about products, recommendations, pricing, stock availability, or comparisons."
+            text: "👋 Hi! I'm ShopSmart AI. Ask me about products, recommendations, pricing, stock availability, or comparisons.",
+            isStreaming: false
         }
     ]);
     const [loading, setLoading] = useState(false);
     const [allProducts, setAllProducts] = useState([]);
     const [recommendedProducts, setRecommendedProducts] = useState([]);
+    
     const chatEndRef = useRef(null);
     const navigate = useNavigate();
+    const ws = useRef(null);
+    const allProductsRef = useRef([]);
+
+    // Keep ref updated for the websocket closure
+    useEffect(() => {
+        allProductsRef.current = allProducts;
+    }, [allProducts]);
 
     useEffect(() => {
         if (open) {
@@ -28,6 +37,51 @@ function AIWidget() {
 
     useEffect(() => {
         fetchProducts();
+        
+        // Initialize WebSocket
+        const baseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+        const wsUrl = baseUrl.replace(/^http/, 'ws') + "/api/v1/ai/ws/chat";
+        
+        ws.current = new WebSocket(wsUrl);
+        
+        ws.current.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            
+            if (data.type === "chunk") {
+                setLoading(false); // Stop loading animation when first chunk arrives
+                setChat(prev => {
+                    const newChat = [...prev];
+                    const lastMsg = newChat[newChat.length - 1];
+                    
+                    if (lastMsg.sender === "ai" && lastMsg.isStreaming) {
+                        lastMsg.text += data.text;
+                    } else {
+                        newChat.push({ sender: "ai", text: data.text, isStreaming: true });
+                    }
+                    return newChat;
+                });
+            } else if (data.type === "done" || data.type === "error") {
+                setLoading(false);
+                setChat(prev => {
+                    const newChat = [...prev];
+                    const lastMsg = newChat[newChat.length - 1];
+                    if (lastMsg && lastMsg.sender === "ai" && lastMsg.isStreaming) {
+                        lastMsg.isStreaming = false;
+                        
+                        // Check for recommended products once complete
+                        const matches = allProductsRef.current.filter(product => lastMsg.text.includes(product.name));
+                        setRecommendedProducts(matches);
+                    }
+                    return newChat;
+                });
+            }
+        };
+
+        return () => {
+            if (ws.current) {
+                ws.current.close();
+            }
+        };
     }, []);
 
     const fetchProducts = async () => {
@@ -39,26 +93,16 @@ function AIWidget() {
         }
     };
 
-    const sendMessage = async () => {
-        if (!message.trim()) return;
+    const sendMessage = () => {
+        if (!message.trim() || !ws.current || ws.current.readyState !== WebSocket.OPEN) return;
+        
         const userText = message;
-        setChat(prev => [...prev, { sender: "user", text: userText }]);
+        setChat(prev => [...prev, { sender: "user", text: userText, isStreaming: false }]);
         setMessage("");
-
-        try {
-            setLoading(true);
-            const response = await api.post("/api/v1/ai/chat", { message: userText });
-            const aiText = response.data.response;
-            setChat(prev => [...prev, { sender: "ai", text: aiText }]);
-
-            const matches = allProducts.filter(product => aiText.includes(product.name));
-            setRecommendedProducts(matches);
-        } catch (error) {
-            console.log(error);
-            setChat(prev => [...prev, { sender: "ai", text: "❌ AI Assistant is currently unavailable." }]);
-        } finally {
-            setLoading(false);
-        }
+        setLoading(true);
+        setRecommendedProducts([]); // Clear previous recommendations
+        
+        ws.current.send(JSON.stringify({ message: userText }));
     };
 
     return (
@@ -123,7 +167,7 @@ function AIWidget() {
                                             </div>
                                         )}
                                         <div className={`prose prose-sm ${msg.sender === "user" ? "prose-invert" : "dark:prose-invert"} max-w-none`}>
-                                            <ReactMarkdown>{msg.text}</ReactMarkdown>
+                                            <ReactMarkdown>{msg.text + (msg.isStreaming ? " ▌" : "")}</ReactMarkdown>
                                         </div>
                                     </div>
                                 </div>
@@ -138,7 +182,7 @@ function AIWidget() {
                                 </div>
                             )}
 
-                            {recommendedProducts.length > 0 && (
+                            {recommendedProducts.length > 0 && !loading && (
                                 <div className="mt-4">
                                     <div className="flex items-center gap-2 text-brand-600 dark:text-brand-400 text-sm font-bold uppercase tracking-wider mb-3 px-1">
                                         <Sparkles size={14} /> Recommended for you

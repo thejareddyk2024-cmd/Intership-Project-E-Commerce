@@ -1,4 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from sqlalchemy.orm import Session
+from fastapi import Depends
+import json
 from sqlalchemy.orm import Session
 from fastapi import Depends
 
@@ -7,7 +10,7 @@ from app.models.product import Product
 from app.core.redis import cache
 
 from app.services.ai_service import (
-    ask_ai
+    ask_ai, model
 )
 
 router = APIRouter(
@@ -85,3 +88,53 @@ INSTRUCTIONS:
     cache.set(cache_key, result, ttl=600)
 
     return result
+
+@router.websocket("/ws/chat")
+async def websocket_chat(websocket: WebSocket, db: Session = Depends(get_db)):
+    await websocket.accept()
+    try:
+        while True:
+            data = await websocket.receive_text()
+            try:
+                payload = json.loads(data)
+                user_message = payload.get("message", "")
+                
+                products = db.query(Product).all()
+                product_context = ""
+                for product in products:
+                    product_context += f"Name: {product.name}\nDescription: {product.description}\nPrice: {product.price}\nStock: {product.stock_quantity}\n\n"
+
+                prompt = f"""
+You are ShopSmart AI, a helpful shopping assistant for an e-commerce tech store.
+
+<CATALOG_OF_AVAILABLE_PRODUCTS>
+{product_context}
+</CATALOG_OF_AVAILABLE_PRODUCTS>
+
+<USER_MESSAGE>
+{user_message}
+</USER_MESSAGE>
+
+INSTRUCTIONS:
+1. You must answer the user's message directly and naturally.
+2. If the user is asking about products, you MUST ONLY recommend products listed inside the <CATALOG_OF_AVAILABLE_PRODUCTS> tags.
+3. CRITICAL: NEVER invent, hallucinate, or recommend ANY product that is not exactly listed in the catalog above.
+4. When recommending a product, include its Name, Price, and a brief reason why it matches. Use bullet points.
+5. If the user asks for a product we don't have, politely apologize and state that you don't carry it, then suggest the closest alternative from the catalog.
+6. If the user just says hello or asks a casual question, greet them warmly and ask how you can help them shop today.
+"""
+                try:
+                    # Stream the response
+                    response = model.generate_content(prompt, stream=True)
+                    for chunk in response:
+                        if chunk.text:
+                            await websocket.send_text(json.dumps({"type": "chunk", "text": chunk.text}))
+                    await websocket.send_text(json.dumps({"type": "done"}))
+                except Exception as e:
+                    error_msg = str(e)
+                    print(f"AI Streaming Error: {error_msg}")
+                    await websocket.send_text(json.dumps({"type": "error", "text": "I'm having trouble connecting right now."}))
+            except json.JSONDecodeError:
+                continue
+    except WebSocketDisconnect:
+        print("WebSocket client disconnected")

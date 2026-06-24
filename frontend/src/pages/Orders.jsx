@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
-import { Package, ArrowRight, Clock, CheckCircle2, AlertCircle } from "lucide-react";
+import { Package, ArrowRight, Clock, CheckCircle2, AlertCircle, Truck } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
@@ -120,14 +120,59 @@ function Orders() {
                                     </div>
                                 </div>
 
-                                <div className="border-t border-slate-100 dark:border-slate-700/50 pt-4 mt-4">
-                                    <div className="flex justify-between items-center text-sm text-slate-500 dark:text-slate-400 mb-4">
-                                        <div>
-                                            <span className="mr-4">
-                                                Shipping: <span className="text-slate-900 dark:text-slate-200 font-medium">Express Delivery</span>
-                                            </span>
+                                <div className="border-t border-slate-100 dark:border-slate-700/50 pt-6 mt-4">
+                                    <div className="mb-6">
+                                        <h6 className="text-sm font-bold text-slate-900 dark:text-white mb-4">Order Status</h6>
+                                        <div className="relative">
+                                            {/* Track Line */}
+                                            <div className="absolute top-1/2 left-0 w-full h-1 bg-slate-100 dark:bg-slate-700 -translate-y-1/2 rounded-full overflow-hidden">
+                                                <motion.div 
+                                                    initial={{ width: 0 }}
+                                                    animate={{ 
+                                                        width: order.status.toLowerCase() === 'delivered' ? '100%' : 
+                                                               order.status.toLowerCase() === 'shipped' ? '66%' : 
+                                                               order.status.toLowerCase() === 'processing' ? '33%' : '0%' 
+                                                    }}
+                                                    className="h-full bg-brand-500"
+                                                />
+                                            </div>
+                                            
+                                            {/* Steps */}
+                                            <div className="relative flex justify-between">
+                                                {['Pending', 'Processing', 'Shipped', 'Delivered'].map((step, stepIdx) => {
+                                                    const statuses = ['pending', 'processing', 'shipped', 'delivered'];
+                                                    const currentIndex = statuses.indexOf(order.status.toLowerCase());
+                                                    const isCompleted = stepIdx <= currentIndex;
+                                                    const isCurrent = stepIdx === currentIndex;
+                                                    
+                                                    let StepIcon = Clock;
+                                                    if (step === 'Processing') StepIcon = Package;
+                                                    if (step === 'Shipped') StepIcon = Truck;
+                                                    if (step === 'Delivered') StepIcon = CheckCircle2;
+                                                    
+                                                    return (
+                                                        <div key={step} className="flex flex-col items-center gap-2">
+                                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center border-4 border-white dark:border-slate-800 relative z-10 transition-colors ${
+                                                                isCompleted 
+                                                                    ? 'bg-brand-500 text-white' 
+                                                                    : 'bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500'
+                                                            } ${isCurrent ? 'ring-4 ring-brand-100 dark:ring-brand-900/30' : ''}`}>
+                                                                <StepIcon size={16} />
+                                                            </div>
+                                                            <span className={`text-xs font-bold ${
+                                                                isCurrent ? 'text-brand-600 dark:text-brand-400' : 
+                                                                isCompleted ? 'text-slate-700 dark:text-slate-300' : 
+                                                                'text-slate-400 dark:text-slate-500'
+                                                            }`}>
+                                                                {step}
+                                                            </span>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
                                         </div>
                                     </div>
+
                                     {order.items && order.items.length > 0 && (
                                         <div>
                                             <h6 className="text-sm font-bold text-slate-900 dark:text-white mb-3">Items in this order:</h6>
