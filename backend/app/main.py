@@ -16,6 +16,18 @@ from app.api.analytics import (
 )
 
 Base.metadata.create_all(bind=engine)
+
+# Auto-migrate: add any missing columns to existing tables
+# SQLAlchemy's create_all() only creates NEW tables, not new columns on existing ones.
+from sqlalchemy import inspect, text as sa_text
+with engine.connect() as conn:
+    inspector = inspect(engine)
+    existing_columns = [c["name"] for c in inspector.get_columns("users")]
+    if "shipping_address" not in existing_columns:
+        conn.execute(sa_text("ALTER TABLE users ADD COLUMN shipping_address VARCHAR(500)"))
+        conn.commit()
+        print("✅ Migration: Added 'shipping_address' column to users table")
+
 from app.core.config import settings
 
 app = FastAPI(
