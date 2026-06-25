@@ -41,3 +41,8 @@ class User(Base):
         DateTime,
         default=datetime.utcnow
     )
+
+    shipping_address: Mapped[str] = mapped_column(
+        String(500),
+        nullable=True
+    )

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import api from "../services/api";
 import { ShoppingCart, Heart, Star, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
@@ -10,6 +10,7 @@ function ProductDetails() {
     const [reviews, setReviews] = useState([]);
     const [rating, setRating] = useState(5);
     const [comment, setComment] = useState("");
+    const [relatedProducts, setRelatedProducts] = useState([]);
 
     useEffect(() => {
         fetchProduct();
@@ -20,6 +21,19 @@ function ProductDetails() {
         try {
             const response = await api.get(`/api/v1/products/${id}`);
             setProduct(response.data);
+            if (response.data.category_id) {
+                fetchRelatedProducts(response.data.category_id, response.data.id);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const fetchRelatedProducts = async (categoryId, currentId) => {
+        try {
+            const res = await api.get(`/api/v1/products?category_id=${categoryId}`);
+            const related = res.data.filter(p => p.id !== currentId);
+            setRelatedProducts(related);
         } catch (error) {
             console.log(error);
         }
@@ -258,6 +272,44 @@ function ProductDetails() {
                     </div>
                 </div>
             </div>
+
+            {/* ── Related Products Carousel ──────────────── */}
+            {relatedProducts.length > 0 && (
+                <div className="border-t border-slate-200 dark:border-slate-800 pt-12 mt-12">
+                    <div className="flex items-center justify-between mb-8">
+                        <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            Related Products
+                        </h2>
+                    </div>
+                    
+                    <div className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory hide-scrollbar">
+                        {relatedProducts.map((item) => (
+                            <Link 
+                                to={`/products/${item.id}`} 
+                                key={item.id}
+                                className="min-w-[280px] max-w-[280px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 snap-start group"
+                            >
+                                <div className="h-48 overflow-hidden bg-slate-100 dark:bg-slate-700/50">
+                                    <img 
+                                        src={item.image_url || "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=400&fit=crop"} 
+                                        alt={item.name} 
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                    />
+                                </div>
+                                <div className="p-5">
+                                    <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-1 truncate">{item.name}</h3>
+                                    <div className="flex items-center justify-between mt-4">
+                                        <span className="font-black text-brand-600 dark:text-brand-400">${item.price}</span>
+                                        <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 group-hover:bg-brand-500 group-hover:text-white transition-colors">
+                                            <ChevronRight size={16} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            )}
         </motion.div>
     );
 }

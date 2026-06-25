@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import { Package, Users, ShoppingCart, DollarSign, Star, Heart, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
+
+const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f43f5e'];
 
 function AdminDashboard() {
     const [stats, setStats] = useState(null);
@@ -142,6 +145,67 @@ function AdminDashboard() {
                     </h5>
                     <div className="inline-flex items-center gap-2 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-4 py-2 rounded-full font-bold">
                         Wishlisted {stats.wishlist_count} times
+                    </div>
+                </motion.div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+                {/* Sales Over Time Chart */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                    className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-8 shadow-sm"
+                >
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Sales Over Time</h3>
+                    <div className="h-80 w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={stats.sales_over_time} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                                <Line type="monotone" dataKey="sales" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                                <CartesianGrid stroke="#ccc" strokeDasharray="5 5" vertical={false} opacity={0.1} />
+                                <XAxis dataKey="date" stroke="#8884d8" tick={{ fill: '#8884d8' }} tickMargin={10} axisLine={false} tickLine={false} />
+                                <YAxis stroke="#8884d8" tick={{ fill: '#8884d8' }} tickMargin={10} axisLine={false} tickLine={false} tickFormatter={(value) => `$${value}`} />
+                                <Tooltip 
+                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }}
+                                    formatter={(value) => [`$${value}`, "Sales"]}
+                                />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
+                </motion.div>
+
+                {/* Revenue by Category Chart */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.7 }}
+                    className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-8 shadow-sm"
+                >
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Revenue by Category</h3>
+                    <div className="h-80 w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie 
+                                    data={stats.revenue_by_category} 
+                                    cx="50%" 
+                                    cy="50%" 
+                                    innerRadius={80} 
+                                    outerRadius={110} 
+                                    paddingAngle={5} 
+                                    dataKey="value"
+                                    stroke="none"
+                                >
+                                    {stats.revenue_by_category?.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip 
+                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }}
+                                    formatter={(value) => [`$${value}`, "Revenue"]}
+                                />
+                                <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                            </PieChart>
+                        </ResponsiveContainer>
                     </div>
                 </motion.div>
             </div>

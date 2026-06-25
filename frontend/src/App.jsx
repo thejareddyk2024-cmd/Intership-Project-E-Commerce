@@ -18,6 +18,7 @@ import AIAssistant from "./pages/AIAssistant";
 import AIWidget from "./components/AIWidget";
 import ProductDetails from "./pages/ProductDetails";
 import AdminDashboard from "./pages/AdminDashboard";
+import ProfilePage from "./pages/ProfilePage";
 
 import { ThemeProvider } from "./components/ThemeProvider";
 
@@ -37,6 +38,7 @@ function App() {
                         <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
                         <Route path="/checkout/success" element={<ProtectedRoute><CheckoutSuccess /></ProtectedRoute>} />
                         <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+                        <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
                         <Route
                             path="/admin-dashboard"
                             element={

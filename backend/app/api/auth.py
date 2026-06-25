@@ -19,10 +19,11 @@ from app.core.jwt import (
 )
 from app.schemas.user import (
     UserCreate,
-    UserResponse
+    UserResponse,
+    UserUpdate
 )
 
-from app.services.user_service import create_user
+from app.services.user_service import create_user, update_user_profile
 
 from app.database.dependencies import get_db
 
@@ -84,3 +85,20 @@ def read_current_user(
     )
 ):
     return current_user
+
+@router.put(
+    "/me",
+    response_model=UserResponse
+)
+def update_current_user(
+    user_data: UserUpdate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    updated_user = update_user_profile(db, current_user.id, user_data)
+    if not updated_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    return updated_user

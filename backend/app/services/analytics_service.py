@@ -5,6 +5,9 @@ from app.models.user import User
 from app.models.order import Order
 from app.models.review import Review
 from app.models.wishlist import Wishlist
+from app.models.category import Category
+from app.models.order_item import OrderItem
+from collections import defaultdict
 
 
 def get_dashboard_stats(db):
@@ -70,6 +73,28 @@ def get_dashboard_stats(db):
         .first()
     )
 
+    # Sales Over Time
+    all_orders = db.query(Order.created_at, Order.total_amount).all()
+    sales_dict = defaultdict(float)
+    for order in all_orders:
+        if order.created_at:
+            date_str = order.created_at.strftime('%Y-%m-%d')
+            sales_dict[date_str] += float(order.total_amount or 0)
+    sales_over_time = [{"date": k, "sales": round(v, 2)} for k, v in sorted(sales_dict.items())]
+
+    # Revenue by Category
+    category_revenue = (
+        db.query(
+            Category.name,
+            func.sum(OrderItem.price * OrderItem.quantity).label("revenue")
+        )
+        .join(Product, Category.id == Product.category_id)
+        .join(OrderItem, Product.id == OrderItem.product_id)
+        .group_by(Category.name)
+        .all()
+    )
+    revenue_by_category = [{"name": cr.name, "value": round(cr.revenue or 0, 2)} for cr in category_revenue]
+
     return {
         "total_products":
             total_products,
@@ -104,5 +129,11 @@ def get_dashboard_stats(db):
         "wishlist_count":
             most_wishlisted.wishlist_count
             if most_wishlisted else
-            0
+            0,
+            
+        "sales_over_time":
+            sales_over_time,
+            
+        "revenue_by_category":
+            revenue_by_category
     }

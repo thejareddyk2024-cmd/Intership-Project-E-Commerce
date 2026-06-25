@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.models.user import User
-from app.schemas.user import UserCreate
+from app.schemas.user import UserCreate, UserUpdate
 from app.core.security import hash_password, verify_password
 
 
@@ -83,4 +83,26 @@ def authenticate_user(
     ):
         return None
 
+    return user
+
+def update_user_profile(
+    db: Session,
+    user_id: int,
+    user_data: UserUpdate
+):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        return None
+
+    if user_data.full_name is not None:
+        user.full_name = user_data.full_name
+    if user_data.email is not None:
+        user.email = user_data.email
+    if user_data.shipping_address is not None:
+        user.shipping_address = user_data.shipping_address
+    if user_data.password is not None and user_data.password.strip() != "":
+        user.password_hash = hash_password(user_data.password)
+
+    db.commit()
+    db.refresh(user)
     return user

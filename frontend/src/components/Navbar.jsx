@@ -61,6 +61,7 @@ function Navbar() {
                                 <NavLink to="/admin/orders">Manage Orders</NavLink>
                             </>
                         )}
+                        <NavLink to="/profile">Profile</NavLink>
                         
                         <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-2" />
 
@@ -127,6 +128,7 @@ function Navbar() {
                                     <NavLink to="/admin/orders">Manage Orders</NavLink>
                                 </>
                             )}
+                            <NavLink to="/profile">Profile</NavLink>
                             
                             <div className="h-px bg-slate-200 dark:bg-slate-800 my-2" />
                             
