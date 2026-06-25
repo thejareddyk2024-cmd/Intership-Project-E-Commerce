@@ -5,7 +5,10 @@ from app.database.dependencies import get_db
 from app.core.auth import get_current_user
 
 from app.schemas.order import (
-    OrderResponse
+    OrderResponse,
+    CheckoutRequest,
+    PromoValidateRequest,
+    PromoValidateResponse
 )
 
 from app.services.order_service import (
@@ -18,6 +21,14 @@ from app.services.stripe_service import create_checkout_session
 from app.core.config import settings
 from pydantic import BaseModel
 
+# Dummy valid promo codes for demo purposes
+ACTIVE_PROMOS = {
+    "SUMMER20": 0.20,
+    "WELCOME10": 0.10,
+    "VIP50": 0.50
+}
+
+# The CheckoutResponse was already defined with BaseModel
 class CheckoutResponse(BaseModel):
     checkout_url: str
 
@@ -28,16 +39,39 @@ router = APIRouter(
 
 
 @router.post(
+    "/validate-promo",
+    response_model=PromoValidateResponse
+)
+def validate_promo(
+    request: PromoValidateRequest,
+    current_user=Depends(get_current_user)
+):
+    code = request.promo_code.upper().strip()
+    if code in ACTIVE_PROMOS:
+        return PromoValidateResponse(
+            valid=True,
+            discount_percent=ACTIVE_PROMOS[code],
+            message=f"Promo applied! You get {int(ACTIVE_PROMOS[code] * 100)}% off."
+        )
+    return PromoValidateResponse(
+        valid=False,
+        discount_percent=0.0,
+        message="Invalid or expired promo code."
+    )
+
+@router.post(
     "/checkout",
     response_model=CheckoutResponse
 )
 def checkout(
+    request: CheckoutRequest,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
     order = create_order(
         db,
-        current_user.id
+        current_user.id,
+        request.promo_code
     )
     
     if not order:

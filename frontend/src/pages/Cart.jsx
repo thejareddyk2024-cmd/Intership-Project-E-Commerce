@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
-import { Trash2, ShoppingCart, ArrowRight } from "lucide-react";
+import { Trash2, ShoppingCart, ArrowRight, Tag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 
 function Cart() {
     const [cart, setCart] = useState([]);
+    
+    // Promo code states
+    const [promoCode, setPromoCode] = useState("");
+    const [appliedPromo, setAppliedPromo] = useState("");
+    const [discountPercent, setDiscountPercent] = useState(0);
+    const [promoMessage, setPromoMessage] = useState({ type: "", text: "" });
+    const [applyingPromo, setApplyingPromo] = useState(false);
 
     useEffect(() => {
         fetchCart();
@@ -36,10 +43,45 @@ function Cart() {
         }
     };
 
+    const applyPromo = async () => {
+        if (!promoCode.trim()) return;
+        setApplyingPromo(true);
+        setPromoMessage({ type: "", text: "" });
+        try {
+            const token = localStorage.getItem("token");
+            const response = await api.post("/api/v1/orders/validate-promo", { promo_code: promoCode }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.data.valid) {
+                setDiscountPercent(response.data.discount_percent);
+                setAppliedPromo(promoCode);
+                setPromoMessage({ type: "success", text: response.data.message });
+            } else {
+                setDiscountPercent(0);
+                setAppliedPromo("");
+                setPromoMessage({ type: "error", text: response.data.message });
+            }
+        } catch (error) {
+            setDiscountPercent(0);
+            setAppliedPromo("");
+            setPromoMessage({ 
+                type: "error", 
+                text: typeof error.response?.data?.detail === 'string' 
+                    ? error.response.data.detail 
+                    : error.response?.data?.detail?.[0]?.msg 
+                        || error.message 
+                        || "Error validating promo code." 
+            });
+        } finally {
+            setApplyingPromo(false);
+        }
+    };
+
     const checkout = async () => {
         try {
             const token = localStorage.getItem("token");
-            const response = await api.post("/api/v1/orders/checkout", {}, {
+            const payload = discountPercent > 0 ? { promo_code: appliedPromo } : {};
+            const response = await api.post("/api/v1/orders/checkout", payload, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             
@@ -54,6 +96,11 @@ function Cart() {
             alert(error.response?.data?.detail || "Checkout failed");
         }
     };
+
+    // Calculate totals dynamically
+    const subtotal = cart.reduce((acc, item) => acc + (item.product?.price || 0) * item.quantity, 0);
+    const discountAmount = subtotal * discountPercent;
+    const finalTotal = subtotal - discountAmount;
 
     return (
         <motion.div 
@@ -113,9 +160,12 @@ function Cart() {
                                             <h5 className="font-bold text-slate-900 dark:text-white mb-1">
                                                 {item.product?.name || `Product #${item.product_id}`}
                                             </h5>
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
-                                                Qty: {item.quantity}
-                                            </span>
+                                            <div className="flex items-center gap-3">
+                                                <span className="font-black text-brand-600 dark:text-brand-400">${item.product?.price}</span>
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                                                    Qty: {item.quantity}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                     <button
@@ -137,21 +187,71 @@ function Cart() {
                         className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-6 lg:sticky lg:top-24 shadow-sm"
                     >
                         <h4 className="font-bold text-slate-900 dark:text-white text-lg mb-6">Order Summary</h4>
-                        <div className="flex justify-between items-center mb-4 text-slate-600 dark:text-slate-300">
-                            <span>Items</span>
-                            <span className="font-semibold">{cart.length}</span>
+                        
+                        <div className="space-y-4 mb-6">
+                            <div className="flex justify-between items-center text-slate-600 dark:text-slate-300 text-sm">
+                                <span>Subtotal ({cart.length} items)</span>
+                                <span className="font-semibold text-slate-900 dark:text-white">${subtotal.toFixed(2)}</span>
+                            </div>
+
+                            {discountPercent > 0 && (
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                                        <Tag size={14} />
+                                        Promo Discount ({discountPercent * 100}%)
+                                    </span>
+                                    <span className="font-bold text-emerald-600 dark:text-emerald-400">-${discountAmount.toFixed(2)}</span>
+                                </div>
+                            )}
+
+                            <div className="flex justify-between items-center text-slate-600 dark:text-slate-300 text-sm">
+                                <span>Shipping</span>
+                                <span className="font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider text-xs">Free</span>
+                            </div>
                         </div>
-                        <div className="flex justify-between items-center mb-6 text-slate-600 dark:text-slate-300">
-                            <span>Shipping</span>
-                            <span className="font-bold text-green-600 dark:text-green-400">FREE</span>
+
+                        {/* Promo Code Input */}
+                        <div className="mb-6 pt-6 border-t border-slate-200 dark:border-slate-700">
+                            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Promo Code</label>
+                            <div className="flex gap-2">
+                                <input 
+                                    type="text" 
+                                    value={promoCode}
+                                    onChange={(e) => setPromoCode(e.target.value)}
+                                    placeholder="e.g. SUMMER20"
+                                    className="flex-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50 uppercase dark:text-white"
+                                />
+                                <button 
+                                    onClick={applyPromo}
+                                    disabled={applyingPromo || !promoCode}
+                                    className="bg-slate-900 hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold transition-colors disabled:opacity-50"
+                                >
+                                    {applyingPromo ? "..." : "Apply"}
+                                </button>
+                            </div>
+                            {promoMessage.text && (
+                                <p className={`mt-2 text-xs font-bold ${promoMessage.type === 'error' ? 'text-red-500' : 'text-emerald-500'}`}>
+                                    {promoMessage.text}
+                                </p>
+                            )}
                         </div>
-                        <div className="border-t border-slate-200 dark:border-slate-700 my-6" />
-                        <div className="flex justify-between items-center mb-8">
-                            <span className="font-bold text-slate-900 dark:text-white text-lg">Total</span>
-                            <span className="font-extrabold bg-gradient-to-r from-brand-600 to-brand-400 bg-clip-text text-transparent text-xl">Ready</span>
+
+                        <div className="border-t border-slate-200 dark:border-slate-700 pt-6 mb-8">
+                            <div className="flex justify-between items-end">
+                                <span className="font-bold text-slate-900 dark:text-white text-lg">Total</span>
+                                <div className="text-right">
+                                    {discountPercent > 0 && (
+                                        <span className="text-sm text-slate-400 line-through block mb-0.5">${subtotal.toFixed(2)}</span>
+                                    )}
+                                    <span className="font-extrabold bg-gradient-to-r from-brand-600 to-brand-400 bg-clip-text text-transparent text-3xl leading-none">
+                                        ${finalTotal.toFixed(2)}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
+
                         <button
-                            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-400 text-white py-4 rounded-xl font-bold transition-all shadow-md hover:shadow-lg hover:shadow-brand-500/20 active:scale-95"
+                            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-400 text-white py-4 rounded-xl font-bold transition-all shadow-md hover:shadow-lg hover:shadow-brand-500/20 active:scale-95 text-lg"
                             onClick={checkout}
                         >
                             Proceed to Checkout

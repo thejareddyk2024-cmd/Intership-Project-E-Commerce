@@ -6,7 +6,8 @@ from fastapi import HTTPException
 
 def create_order(
     db,
-    user_id: int
+    user_id: int,
+    promo_code: str = None
 ):
     cart_items = (
         db.query(Cart)
@@ -69,7 +70,16 @@ def create_order(
         # Remove cart item
         db.delete(item)
 
-    order.total_amount = total_amount
+    # Apply discount if valid promo_code provided
+    if promo_code:
+        # Avoid circular import by defining it here or importing locally
+        from app.api.order import ACTIVE_PROMOS
+        code = promo_code.upper().strip()
+        if code in ACTIVE_PROMOS:
+            discount = ACTIVE_PROMOS[code]
+            total_amount = total_amount * (1 - discount)
+
+    order.total_amount = round(total_amount, 2)
 
     db.commit()
     db.refresh(order)

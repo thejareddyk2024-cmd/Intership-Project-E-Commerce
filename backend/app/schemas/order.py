@@ -22,4 +22,14 @@ class OrderResponse(BaseModel):
 
     class Config:
         from_attributes = True
-        
+
+class CheckoutRequest(BaseModel):
+    promo_code: Optional[str] = None
+
+class PromoValidateRequest(BaseModel):
+    promo_code: str
+
+class PromoValidateResponse(BaseModel):
+    valid: bool
+    discount_percent: float
+    message: str
